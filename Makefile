@@ -1,7 +1,7 @@
 LIBS_ = sfml-graphics sfml-audio sfml-window sfml-system
 LIBS = $(patsubst %,-l%,$(LIBS_))
 
-main: main.cpp staff.cpp
+main: main.cpp staff.cpp audioProcessor.cpp
 	g++ -g -o $@ $^ $(LIBS) -std=c++20
 
 .PHONY: clean
