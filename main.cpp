@@ -59,16 +59,16 @@ void pollEvents(sf::RenderWindow& window, Staff& staff) {
    }
 }
 
-std::vector<complex> fft(const std::vector<complex>& x) {
+std::vector<complex> fft(std::span<const complex> x) {
    const int N = x.size();
 
-   if (N <= 1) return x;
+   if (N <= 1) return std::vector<complex>{x.begin(), x.end()};
 
    std::vector<complex> even(x.size()/2);
    std::vector<complex> odd(x.size()/2);
    for (unsigned i = 0; i < N; i++)
    {
-      (i%2==0 ? even : odd).at(i/2) = x.at(i);
+      (i%2==0 ? even : odd)[i/2] = x[i];
    }
 
    even = fft(even);
@@ -77,9 +77,9 @@ std::vector<complex> fft(const std::vector<complex>& x) {
    std::vector<complex> result(N);
    for (unsigned k = 0; k < N/2; k++)
    {
-      complex t = odd.at(k) * std::exp(complex(0,-2*M_PI) * complex(static_cast<double>(k)/N,0));
-      result.at(k    ) = even.at(k) + t;
-      result.at(k+N/2) = even.at(k) - t;
+      complex t = odd[k] * std::exp(complex(0,-2*M_PI) * complex(static_cast<double>(k)/N,0));
+      result[k    ] = even[k] + t;
+      result[k+N/2] = even[k] - t;
    }
 
    return result;
@@ -100,7 +100,7 @@ int getNoteIndex(double frequency)
    return index % 12;
 }
 
-std::vector<double> amplitudeToPower(const std::vector<complex>& amplitudes)
+std::vector<double> amplitudeToPower(std::span<const complex> amplitudes)
 {
    std::vector<double> power;
    power.reserve(amplitudes.size());
