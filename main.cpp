@@ -66,37 +66,36 @@ std::vector<complex> fft(const std::vector<complex>& x) {
 
    if (N <= 1) return x;
 
-   std::vector<complex> even;
-   std::vector<complex> odd;
+   std::vector<complex> even(x.size()/2);
+   std::vector<complex> odd(x.size()/2);
    for (unsigned i = 0; i < N; i++)
    {
-      (i%2==0 ? even : odd).push_back(x.at(i));
+      (i%2==0 ? even : odd).at(i/2) = x.at(i);
    }
 
    even = fft(even);
    odd = fft(odd);
 
-   std::vector<complex> t;
-   for (unsigned k = 0; k < odd.size(); k++)
+   std::vector<complex> result(N);
+   for (unsigned k = 0; k < N/2; k++)
    {
-      t.push_back(odd.at(k) * std::exp(complex(0,-2) * M_PI * complex(k,0) / complex(N, 0)));
-   }
-
-   std::vector<complex> result;
-
-   for (unsigned k = 0; k < even.size(); k++)
-   {
-      result.push_back(even.at(k) + t.at(k));
-   }
-
-   for (unsigned k = 0; k < even.size(); k++)
-   {
-      result.push_back(even.at(k) - t.at(k));
+      complex t = odd.at(k) * std::exp(complex(0,-2*M_PI) * complex(static_cast<double>(k)/N,0));
+      result.at(k    ) = even.at(k) + t;
+      result.at(k+N/2) = even.at(k) - t;
    }
 
    return result;
 }
 
+double getFrequency(unsigned index, unsigned sample_rate, unsigned number_of_samples)
+{
+   return static_cast<double>(index * sample_rate)/number_of_samples;
+}
+
+int getNoteIndex(double frequency)
+{
+   return std::round(12*std::log2(frequency/440.0));
+}
 
 void doSoundStuff()
 {
@@ -108,12 +107,12 @@ void doSoundStuff()
    }
    const sf::Int16* samples = buffer.getSamples();
    std::size_t sample_count = buffer.getSampleCount();
-   std::vector<complex> audio_data;
+   std::vector<complex> audio_data(sample_count);
 
    auto sample_rate = buffer.getSampleRate();
 
    std::transform(samples, samples + sample_count, 
-      std::back_inserter(audio_data),
+      audio_data.begin(),
       [](sf::Int16 i) { return complex(i, 0); }
    );
 
@@ -138,9 +137,7 @@ void doSoundStuff()
       }
    }
 
-   double frequency = static_cast<double>(i * sample_rate)/frequency_data.size();
-
-   int note_index = std::round(12*std::log2(frequency/440.0));
+   int note_index = getNoteIndex(getFrequency(i, sample_rate, frequency_data.size()));
    while (note_index < 0)
    {
       note_index += 12;
