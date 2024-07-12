@@ -10,8 +10,17 @@ AudioProcessor::AudioProcessor()
 bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t sample_count)
 {
    // Check if avg power level is high enough first
+   std::span<const sf::Int16> samples_span{samples, sample_count};
 
-   int note_index = getNoteIndex(highestFrequency({samples, sample_count}));
+   double total_power = 0;
+   for (auto sample : samples_span)
+   {
+      total_power += sample*sample;
+   }
+
+   total_power /= sample_count;
+
+   int note_index = getNoteIndex(highestFrequency(samples_span));
 
    std::cout << [&note_index]() {
       switch (note_index)
