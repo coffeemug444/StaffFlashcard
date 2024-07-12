@@ -58,9 +58,6 @@ void pollEvents(sf::RenderWindow& window, Staff& staff) {
    }
 }
 
-
-
-
 std::vector<complex> fft(const std::vector<complex>& x) {
    const int N = x.size();
 
@@ -94,7 +91,37 @@ double getFrequency(unsigned index, unsigned sample_rate, unsigned number_of_sam
 
 int getNoteIndex(double frequency)
 {
-   return std::round(12*std::log2(frequency/440.0));
+   int index = std::round(12*std::log2(frequency/440.0));
+   while (index < 0)
+   {
+      index += 12;
+   }
+   return index % 12;
+}
+
+std::vector<double> amplitudeToPower(const std::vector<complex>& amplitudes)
+{
+   std::vector<double> power;
+   power.reserve(amplitudes.size());
+   std::transform(amplitudes.begin(), amplitudes.end(), std::back_inserter(power), [](const complex& x) { return std::abs(x); });
+   return power;
+}
+
+double highestFrequency(const sf::Int16* samples, std::size_t sample_count, unsigned sample_rate)
+{
+   std::vector<complex> audio_data;
+   audio_data.reserve(sample_count);
+   std::transform(samples, samples + sample_count, 
+      std::back_inserter(audio_data),
+      [](sf::Int16 i) { return complex(i, 0); }
+   );
+
+   audio_data.resize(std::pow(2.0, std::ceil(std::log2(sample_count))));
+   const std::vector<double>& frequency_data = amplitudeToPower(fft(audio_data));
+
+   int i = std::distance(frequency_data.begin(), std::max_element(frequency_data.begin(), frequency_data.end()));
+
+   return getFrequency(i, sample_rate, frequency_data.size());
 }
 
 void doSoundStuff()
@@ -107,60 +134,27 @@ void doSoundStuff()
    }
    const sf::Int16* samples = buffer.getSamples();
    std::size_t sample_count = buffer.getSampleCount();
-   std::vector<complex> audio_data(sample_count);
-
-   auto sample_rate = buffer.getSampleRate();
-
-   std::transform(samples, samples + sample_count, 
-      audio_data.begin(),
-      [](sf::Int16 i) { return complex(i, 0); }
-   );
-
-   int nearest_pow_2 = 1;
-   while (sample_count > nearest_pow_2)
-   {
-      nearest_pow_2 *= 2;
-   }
-   audio_data.resize(nearest_pow_2);
-
-   std::vector<complex> frequency_data = fft(audio_data);
-
-   int i = 0;
-   double highest = 0;
-   for (int j = 0; j < frequency_data.size(); j++)
-   {
-      double val = std::abs(frequency_data.at(j));
-      if (val > highest)
-      {
-         highest = val;
-         i = j;
-      }
-   }
-
-   int note_index = getNoteIndex(getFrequency(i, sample_rate, frequency_data.size()));
-   while (note_index < 0)
-   {
-      note_index += 12;
-   }
-   note_index = note_index % 12;
-
+   
+   int note_index = getNoteIndex(highestFrequency(samples, sample_count, buffer.getSampleRate()));
+   const char* note_name;
    switch (note_index)
    {
-   case 0:  std::cout << "A\n"; break;
-   case 1:  std::cout << "A#\n"; break;
-   case 2:  std::cout << "B\n"; break;
-   case 3:  std::cout << "C\n"; break;
-   case 4:  std::cout << "C#\n"; break;
-   case 5:  std::cout << "D\n"; break;
-   case 6:  std::cout << "D#\n"; break;
-   case 7:  std::cout << "E\n"; break;
-   case 8:  std::cout << "F\n"; break;
-   case 9:  std::cout << "F#\n"; break;
-   case 10: std::cout << "G\n"; break;
-   case 11: std::cout << "G#\n"; break;
+   case 0:  note_name = "A" ; break;
+   case 1:  note_name = "A#"; break;
+   case 2:  note_name = "B" ; break;
+   case 3:  note_name = "C" ; break;
+   case 4:  note_name = "C#"; break;
+   case 5:  note_name = "D" ; break;
+   case 6:  note_name = "D#"; break;
+   case 7:  note_name = "E" ; break;
+   case 8:  note_name = "F" ; break;
+   case 9:  note_name = "F#"; break;
+   case 10: note_name = "G" ; break;
+   case 11: note_name = "G#"; break;
    default:
       break;
    }
+   std::cout << note_name << std::endl;
 }
 
 int main()
