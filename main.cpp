@@ -7,6 +7,7 @@
 #include <SFML/Audio.hpp>
 #include <cmath>
 #include <iostream>
+#include <span>
 
 using complex = std::complex<double>;
 
@@ -107,16 +108,16 @@ std::vector<double> amplitudeToPower(const std::vector<complex>& amplitudes)
    return power;
 }
 
-double highestFrequency(const sf::Int16* samples, std::size_t sample_count, unsigned sample_rate)
+double highestFrequency(std::span<const sf::Int16> samples, unsigned sample_rate)
 {
    std::vector<complex> audio_data;
-   audio_data.reserve(sample_count);
-   std::transform(samples, samples + sample_count, 
+   audio_data.reserve(samples.size());
+   std::transform(samples.begin(), samples.end(), 
       std::back_inserter(audio_data),
       [](sf::Int16 i) { return complex(i, 0); }
    );
 
-   audio_data.resize(std::pow(2.0, std::ceil(std::log2(sample_count))));
+   audio_data.resize(std::pow(2.0, std::ceil(std::log2(samples.size()))));
    const std::vector<double>& frequency_data = amplitudeToPower(fft(audio_data));
 
    int i = std::distance(frequency_data.begin(), std::max_element(frequency_data.begin(), frequency_data.end()));
@@ -135,7 +136,7 @@ void doSoundStuff()
    const sf::Int16* samples = buffer.getSamples();
    std::size_t sample_count = buffer.getSampleCount();
    
-   int note_index = getNoteIndex(highestFrequency(samples, sample_count, buffer.getSampleRate()));
+   int note_index = getNoteIndex(highestFrequency({samples, sample_count}, buffer.getSampleRate()));
    const char* note_name;
    switch (note_index)
    {
