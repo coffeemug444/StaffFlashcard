@@ -1,3 +1,4 @@
+#pragma once
 #include <SFML/Audio.hpp>
 #include <vector>
 #include <span>
@@ -6,15 +7,16 @@
 
 using complex = std::complex<double>;
 
+class Staff;
+
 class AudioProcessor : public sf::SoundRecorder
 {
 public:
-   AudioProcessor();
+   AudioProcessor(Staff& staff);
    bool onProcessSamples(const sf::Int16* samples, std::size_t sampleCount) override;
 
+   ~AudioProcessor() { stop(); }
 private:
-
-
 
    double getFrequency(unsigned index, unsigned number_of_samples);
    std::optional<int> getNoteIndex(double frequency);
@@ -25,6 +27,7 @@ private:
 
 
    static constexpr unsigned SAMPLE_RATE = 44100;
-   
+
+   Staff& m_staff;
    sf::SoundBuffer m_buffer;
 };

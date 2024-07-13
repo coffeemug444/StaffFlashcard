@@ -12,28 +12,6 @@
 
 using complex = std::complex<double>;
 
-int getRandomNumber()
-{
-   static std::random_device rd; // obtain a random number from hardware
-   static std::mt19937 gen(rd()); // seed the generator
-   static std::uniform_int_distribution<> distr(-2, 3); // define the range
-
-   static std::deque<int> prev_numbers;
-
-   int num = distr(gen);
-   while (std::find(prev_numbers.begin(), prev_numbers.end(), num) != prev_numbers.end())
-   {
-      num = distr(gen);
-   }
-
-   prev_numbers.push_back(num);
-   while(prev_numbers.size() > 2)
-   {
-      prev_numbers.pop_front();
-   }
-
-   return num;
-}
 
 void pollEvents(sf::RenderWindow& window, Staff& staff) {
    sf::Event event;
@@ -45,10 +23,6 @@ void pollEvents(sf::RenderWindow& window, Staff& staff) {
          window.close();
          break;
       case sf::Event::KeyPressed:
-         if (event.key.code == sf::Keyboard::Enter)
-         {
-            staff.drawNote(getRandomNumber());
-         }
          if (event.key.code == sf::Keyboard::Escape)
          {
             window.close();
@@ -61,7 +35,7 @@ void pollEvents(sf::RenderWindow& window, Staff& staff) {
 }
 
 
-void doSoundStuff()
+void setupAudio(AudioProcessor& processor)
 {
    std::vector<std::string> available_devices = AudioProcessor::getAvailableDevices();
    for (int i = 0; i < available_devices.size(); i++)
@@ -72,7 +46,6 @@ void doSoundStuff()
    int selected_device;
    std::cin >> selected_device;
 
-   AudioProcessor processor;
    if (not processor.setDevice(available_devices.at(selected_device)))
    {
       std::cout << "Failed to set recording device\n";
@@ -80,18 +53,18 @@ void doSoundStuff()
    }
 
    processor.start();
-
-   while (true) {}
 }
 
 int main()
 {
-   doSoundStuff();
-   return 1;
-   sf::RenderWindow window(sf::VideoMode(150, 140), "Staff flashcard");
-
    Staff staff{100};
    staff.move(0,10);
+
+   AudioProcessor processor{staff};
+   setupAudio(processor);
+   
+   sf::RenderWindow window(sf::VideoMode(150, 140), "Staff flashcard");
+
 
    while (window.isOpen())
    {

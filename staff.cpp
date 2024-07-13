@@ -1,5 +1,8 @@
 #include "staff.hpp"
-
+#include <random>
+#include <deque>
+#include <iostream>
+#include <map>
 
 Staff::Staff(float height)
    :m_height{height}
@@ -15,6 +18,8 @@ Staff::Staff(float height)
    m_cleff.move(height*.8,-height*.2); // lol
    m_lines.move(0,-height*.2); // lol
    m_note.move(0,-height*.2); // lol
+
+   setRandomNote();
 }
 
 void Staff::setPos(float x, float y)
@@ -45,6 +50,58 @@ void Staff::drawNote(int position)
    float x = m_position.x + m_height*0.8;
    float y = m_position.y + m_y1 + position*m_note_height/2;
    m_note.setPosition(x,y);
+}
+
+void Staff::setRandomNote()
+{
+   static std::random_device rd; // obtain a random number from hardware
+   static std::mt19937 gen(rd()); // seed the generator
+   static std::uniform_int_distribution<> distr(-2, 3); // define the range
+
+   static std::deque<int> prev_numbers;
+
+   int num = distr(gen);
+   while (std::find(prev_numbers.begin(), prev_numbers.end(), num) != prev_numbers.end())
+   {
+      num = distr(gen);
+   }
+
+   prev_numbers.push_back(num);
+   while(prev_numbers.size() > 2)
+   {
+      prev_numbers.pop_front();
+   }
+
+   drawNote(num);
+
+
+
+   int note_index = num;
+   while (note_index < 0)
+   {
+      note_index += 7;
+   }
+   note_index = note_index % 7;
+
+   const auto note_map = std::map<int, Note> {
+      {0, Note::E},
+      {1, Note::D},
+      {2, Note::C},
+      {3, Note::B},
+      {4, Note::A},
+      {5, Note::G},
+      {6, Note::F},
+   };
+
+   m_current_note = note_map.at(note_index);
+}
+
+void Staff::guessNote(Note note)
+{
+   if (note == m_current_note)
+   {
+      setRandomNote();
+   }
 }
 
 void Staff::draw(sf::RenderTarget& target, sf::RenderStates /*states*/) const

@@ -1,10 +1,11 @@
 #include "audioProcessor.hpp"
 #include <iostream>
+#include "staff.hpp"
 
 
-AudioProcessor::AudioProcessor()
+AudioProcessor::AudioProcessor(Staff& staff)
+   :m_staff{staff}
 {
-   std::cout << "Audio processor constructed\n";
    setProcessingInterval(sf::milliseconds(100));
 }
 
@@ -20,7 +21,7 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
    }
 
    total_power /= sample_count;
-   if (total_power < 10'000)
+   if (total_power < 1'000'000)
    {
       // get this value from a calibration step
       return true;
@@ -28,6 +29,8 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
 
    std::optional<int> note_index = getNoteIndex(highestFrequency(samples_span));
    if (not note_index.has_value()) return true;
+
+   m_staff.guessNote(getNoteFromIndex(note_index.value()));
 
    return true;
 }
