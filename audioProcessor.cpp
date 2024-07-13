@@ -5,6 +5,7 @@
 AudioProcessor::AudioProcessor()
 {
    std::cout << "Audio processor constructed\n";
+   setProcessingInterval(sf::milliseconds(100));
 }
 
 bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t sample_count)
@@ -19,27 +20,14 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
    }
 
    total_power /= sample_count;
+   if (total_power < 10'000)
+   {
+      // get this value from a calibration step
+      return true;
+   }
 
-   int note_index = getNoteIndex(highestFrequency(samples_span));
-
-   std::cout << [&note_index]() {
-      switch (note_index)
-      {
-      case 0:  return "A" ;
-      case 1:  return "A#";
-      case 2:  return "B" ;
-      case 3:  return "C" ;
-      case 4:  return "C#";
-      case 5:  return "D" ;
-      case 6:  return "D#";
-      case 7:  return "E" ;
-      case 8:  return "F" ;
-      case 9:  return "F#";
-      case 10: return "G" ;
-      case 11: return "G#";
-      default: return ""  ;
-      }
-   }() << std::endl;
+   std::optional<int> note_index = getNoteIndex(highestFrequency(samples_span));
+   if (not note_index.has_value()) return true;
 
    return true;
 }
@@ -75,14 +63,24 @@ double AudioProcessor::getFrequency(unsigned index, unsigned number_of_samples)
    return static_cast<double>(index * SAMPLE_RATE)/number_of_samples;
 }
 
-int AudioProcessor::getNoteIndex(double frequency)
+std::optional<int> AudioProcessor::getNoteIndex(double frequency)
 {
-   int index = std::round(12*std::log2(frequency/440.0));
-   while (index < 0)
+
+   double index = 12*std::log2(frequency/440.0);
+   int rounded_index = std::round(index);
+   double remainder = index - rounded_index;
+
+   if (0.1 <= remainder and remainder <= 0.9)
    {
-      index += 12;
+      // this is unacceptable!!
+      return std::nullopt;
    }
-   return index % 12;
+
+   while (rounded_index < 0)
+   {
+      rounded_index += 12;
+   }
+   return rounded_index % 12;
 }
 
 std::vector<double> AudioProcessor::amplitudeToPower(std::span<const complex> amplitudes)
@@ -105,7 +103,13 @@ double AudioProcessor::highestFrequency(std::span<const sf::Int16> samples)
    audio_data.resize(std::pow(2.0, std::ceil(std::log2(samples.size()))));
    const std::vector<double>& frequency_data = amplitudeToPower(fft(audio_data));
 
-   int i = std::distance(frequency_data.begin(), std::max_element(frequency_data.begin(), frequency_data.end()));
+   // int i = std::distance(frequency_data.begin(), std::max_element(frequency_data.begin(), frequency_data.end()));
+
+   int i = std::distance(frequency_data.begin(), std::find_if(frequency_data.begin(), frequency_data.end(), [](double x) { return x > 1'000'000; }));
+   if (i == frequency_data.size())
+   {
+      i = std::distance(frequency_data.begin(), std::max_element(frequency_data.begin(), frequency_data.end()));
+   }
 
    return getFrequency(i, frequency_data.size());
 }

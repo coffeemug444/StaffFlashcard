@@ -2,6 +2,7 @@
 #include <vector>
 #include <span>
 #include <complex>
+#include <optional>
 
 using complex = std::complex<double>;
 
@@ -16,7 +17,7 @@ private:
 
 
    double getFrequency(unsigned index, unsigned number_of_samples);
-   int getNoteIndex(double frequency);
+   std::optional<int> getNoteIndex(double frequency);
 
    std::vector<complex> fft(std::span<const complex> x);
    std::vector<double> amplitudeToPower(std::span<const complex> amplitudes);
