@@ -63,8 +63,6 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
 
    auto best_note = std::max_element(restricted_bins.begin(), restricted_bins.end());
 
-   std::cout << (*best_note / total_power) << std::endl;
-
    if ((*best_note / total_power) < 1000) return true;
 
    Note note = static_cast<Note>(std::distance(restricted_bins.begin(), best_note));
