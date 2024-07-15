@@ -6,6 +6,7 @@
 AudioProcessor::AudioProcessor(std::function<void(Note)> on_note_guessed)
    :m_on_note_guessed{on_note_guessed}
 {
+   setProcessingInterval(sf::milliseconds(200));
 }
 
 bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t sample_count)
@@ -22,11 +23,6 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
    }
 
    total_power /= sample_count;
-   if (total_power < 1'000'000)
-   {
-      // get this value from a calibration step
-      return true;
-   }
 
    double lowest_frequency = 55.0; // equivalent of A1
    std::vector<double> bins {};
@@ -56,7 +52,11 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
       }
    }
 
-   Note note = static_cast<Note>(std::distance(bins.begin(), std::max_element(bins.begin(), bins.end())) % 12);
+   auto best_note = std::max_element(bins.begin(), bins.end());
+
+   if ((*best_note / total_power) < 1000) return true;
+
+   Note note = static_cast<Note>(std::distance(bins.begin(), best_note) % 12);
 
    m_on_note_guessed(note);
 
