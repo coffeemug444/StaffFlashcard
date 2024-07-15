@@ -1,6 +1,7 @@
 #include "audioProcessor.hpp"
 #include <iostream>
 #include "staff.hpp"
+#include <utility>
 
 
 AudioProcessor::AudioProcessor(std::function<void(Note)> on_note_guessed)
@@ -33,21 +34,21 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
       bins.push_back(goertzelMag(samples_double, lowest_frequency*std::pow(2.0, note/12.0)));
    }
 
-   auto harmonics = {
-      12,         // octave (12th fret harmonic)
-      12+7,       // octave + perfect 5th (7th fret harmonic)
-      2*12,       // 2 octaves (5th fret harmonic)
-      2*12 + 4,   // 2 octaves + major 3rd (9th fret harmonic)
-      2*12 + 7    // 2 octaves + perfect 5th (idk but I'm sure it's present somehow)
+   std::vector<std::pair<int, double>> harmonics = {
+      {12      , 2.0/4},  // octave (12th fret harmonic)
+      {12+7    , 3.0/8},  // octave + perfect 5th (7th fret harmonic)
+      {2*12    , 2.0/8},  // 2 octaves (5th fret harmonic)
+      {2*12 + 4, 3.0/16}, // 2 octaves + major 3rd (9th fret harmonic)
+      {2*12 + 7, 3.0/16}  // 2 octaves + perfect 5th (idk but I'm sure it's present somehow)
    };
 
    for (int note = 0; note < bins.size(); note++)
    {
-      for (auto harmonic : harmonics)
+      for (auto [harmonic, strength] : harmonics)
       {
          if ((note + harmonic) < bins.size())
          {
-            bins.at(note) *= bins.at(note + harmonic);
+            bins.at(note) += strength*bins.at(note + harmonic);
          }
       }
    }
