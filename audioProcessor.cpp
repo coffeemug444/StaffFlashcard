@@ -3,8 +3,8 @@
 #include "staff.hpp"
 
 
-AudioProcessor::AudioProcessor(Staff& staff)
-   :m_staff{staff}
+AudioProcessor::AudioProcessor(std::function<void(Note)> on_note_guessed)
+   :m_on_note_guessed{on_note_guessed}
 {
 }
 
@@ -62,9 +62,9 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
 
    }
 
-   Note note {std::distance(bins.begin(), std::max_element(bins.begin(), bins.end())) % 12};
+   Note note = static_cast<Note>(std::distance(bins.begin(), std::max_element(bins.begin(), bins.end())) % 12);
 
-   m_staff.guessNote(note);
+   m_on_note_guessed(note);
 
    return true;
 }

@@ -9,23 +9,25 @@
 #include <iostream>
 #include <span>
 #include "audioProcessor.hpp"
+#include "main.hpp"
+#include <functional>
 
 using complex = std::complex<double>;
 
 
-void pollEvents(sf::RenderWindow& window, Staff& staff) {
+void Main::pollEvents() {
    sf::Event event;
-   while (window.pollEvent(event))
+   while (m_window->pollEvent(event))
    {
       switch (event.type)
       {
       case sf::Event::Closed:
-         window.close();
+         m_window->close();
          break;
       case sf::Event::KeyPressed:
          if (event.key.code == sf::Keyboard::Escape)
          {
-            window.close();
+            m_window->close();
          }
          break;
       default:
@@ -35,7 +37,7 @@ void pollEvents(sf::RenderWindow& window, Staff& staff) {
 }
 
 
-void setupAudio(AudioProcessor& processor)
+void Main::setupAudio()
 {
    std::vector<std::string> available_devices = AudioProcessor::getAvailableDevices();
    for (int i = 0; i < available_devices.size(); i++)
@@ -46,34 +48,45 @@ void setupAudio(AudioProcessor& processor)
    int selected_device;
    std::cin >> selected_device;
 
-   if (not processor.setDevice(available_devices.at(selected_device)))
+   if (not m_audio_processor.setDevice(available_devices.at(selected_device)))
    {
       std::cout << "Failed to set recording device\n";
       return;
    }
 
-   processor.start();
+   m_audio_processor.start();
+}
+
+void Main::onNoteGuessed(Note note)
+{
+   m_staff.guessNote(note);
+}
+
+Main::Main()
+   :m_window{}
+   ,m_staff{100}
+   ,m_audio_processor{std::bind(&Main::onNoteGuessed, this, std::placeholders::_1)}
+{
+   setupAudio();
+   m_window = std::make_unique<sf::RenderWindow>(sf::VideoMode(150, 140), "Staff flashcard");
+}
+
+void Main::loop()
+{
+   while (m_window->isOpen())
+   {
+      pollEvents();
+
+      m_window->clear();
+      m_window->draw(m_staff);
+      m_window->display();
+   }
 }
 
 int main()
 {
-   Staff staff{100};
-   staff.move(0,10);
-
-   AudioProcessor processor{staff};
-   setupAudio(processor);
-   
-   sf::RenderWindow window(sf::VideoMode(150, 140), "Staff flashcard");
-
-
-   while (window.isOpen())
-   {
-      pollEvents(window, staff);
-
-      window.clear();
-      window.draw(staff);
-      window.display();
-   }
+   Main m;
+   m.loop();
 
    return 0;
 }
