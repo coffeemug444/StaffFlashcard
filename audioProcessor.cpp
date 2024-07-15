@@ -6,16 +6,17 @@
 AudioProcessor::AudioProcessor(Staff& staff)
    :m_staff{staff}
 {
-   setProcessingInterval(sf::milliseconds(100));
 }
 
 bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t sample_count)
 {
-   // Check if avg power level is high enough first
-   std::span<const sf::Int16> samples_span{samples, sample_count};
+   std::vector<double> samples_double;
+   samples_double.reserve(sample_count);
+
+   std::transform(samples, samples + sample_count, std::back_inserter(samples_double), [](sf::Int16 sample) { return static_cast<double>(sample); });
 
    double total_power = 0;
-   for (auto sample : samples_span)
+   for (auto sample : samples_double)
    {
       total_power += sample*sample;
    }
@@ -27,92 +28,70 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
       return true;
    }
 
-   std::optional<int> note_index = getNoteIndex(highestFrequency(samples_span));
-   if (not note_index.has_value()) return true;
+   double lowest_frequency = 55.0; // equivalent of A1
+   std::vector<double> bins {};
 
-   m_staff.guessNote(getNoteFromIndex(note_index.value()));
+   for (int note = 0; note < 12*7; note++)
+   {
+      // 7 octaves of notes
+      bins.push_back(goertzel_mag(samples_double, lowest_frequency*std::pow(2.0, note/12.0)));
+   }
+
+   for (int note = 0; note < bins.size(); note++)
+   {
+      if ((note + 12) < bins.size())
+      {
+         bins.at(note) *= bins.at(note + 12);
+      }
+      if ((note + 12 + 7) < bins.size())
+      {
+         bins.at(note) *= bins.at(note + 12 + 7);
+      }
+      if ((note + 2*12) < bins.size())
+      {
+         bins.at(note) *= bins.at(note + 2*12);
+      }
+      if ((note + 2*12 + 4) < bins.size())
+      {
+         bins.at(note) *= bins.at(note + 2*12 + 4);
+      }
+      if ((note + 2*12 + 7) < bins.size())
+      {
+         bins.at(note) *= bins.at(note + 2*12 + 7);
+      }
+
+   }
+
+   Note note {std::distance(bins.begin(), std::max_element(bins.begin(), bins.end())) % 12};
+
+   m_staff.guessNote(note);
 
    return true;
 }
 
-std::vector<complex> AudioProcessor::fft(std::span<const complex> x) {
-   const int N = x.size();
-
-   if (N <= 1) return std::vector<complex>{x.begin(), x.end()};
-
-   std::vector<complex> even(x.size()/2);
-   std::vector<complex> odd(x.size()/2);
-   for (unsigned i = 0; i < N; i++)
-   {
-      (i%2==0 ? even : odd)[i/2] = x[i];
-   }
-
-   even = fft(even);
-   odd = fft(odd);
-
-   std::vector<complex> result(N);
-   for (unsigned k = 0; k < N/2; k++)
-   {
-      complex t = odd[k] * std::exp(complex(0,-2*M_PI) * complex(static_cast<double>(k)/N,0));
-      result[k    ] = even[k] + t;
-      result[k+N/2] = even[k] - t;
-   }
-
-   return result;
-}
-
-double AudioProcessor::getFrequency(unsigned index, unsigned number_of_samples)
+double AudioProcessor::goertzel_mag(std::span<const double> samples, double frequency)
 {
-   return static_cast<double>(index * SAMPLE_RATE)/number_of_samples;
-}
+   int k = std::round((samples.size() * frequency) / SAMPLE_RATE);
+   double omega = (2.0 * M_PI * k) / samples.size();
+   double sine = sin(omega);
+   double cosine = cos(omega);
+   double coeff = 2.0 * cosine;
+   double q0=0;
+   double q1=0;
+   double q2=0;
 
-std::optional<int> AudioProcessor::getNoteIndex(double frequency)
-{
-
-   double index = 12*std::log2(frequency/440.0);
-   int rounded_index = std::round(index);
-   double remainder = index - rounded_index;
-
-   if (0.1 <= remainder and remainder <= 0.9)
+   for (double sample : samples)
    {
-      // this is unacceptable!!
-      return std::nullopt;
+      q0 = coeff * q1 - q2 + sample;
+      q2 = q1;
+      q1 = q0;
    }
 
-   while (rounded_index < 0)
-   {
-      rounded_index += 12;
-   }
-   return rounded_index % 12;
-}
+   // calculate the real and imaginary results
+   // scaling appropriately
+   double real = 2*(q1 - q2 * cosine) / samples.size();
+   double imag = 2*(q2 * sine) / samples.size();
 
-std::vector<double> AudioProcessor::amplitudeToPower(std::span<const complex> amplitudes)
-{
-   std::vector<double> power;
-   power.reserve(amplitudes.size());
-   std::transform(amplitudes.begin(), amplitudes.end(), std::back_inserter(power), [](const complex& x) { return std::abs(x); });
-   return power;
-}
-
-double AudioProcessor::highestFrequency(std::span<const sf::Int16> samples)
-{
-   std::vector<complex> audio_data;
-   audio_data.reserve(samples.size());
-   std::transform(samples.begin(), samples.end(), 
-      std::back_inserter(audio_data),
-      [](sf::Int16 i) { return complex(i, 0); }
-   );
-
-   audio_data.resize(std::pow(2.0, std::ceil(std::log2(samples.size()))));
-   const std::vector<double>& frequency_data = amplitudeToPower(fft(audio_data));
-
-   // int i = std::distance(frequency_data.begin(), std::max_element(frequency_data.begin(), frequency_data.end()));
-
-   int i = std::distance(frequency_data.begin(), std::find_if(frequency_data.begin(), frequency_data.end(), [](double x) { return x > 1'000'000; }));
-   if (i == frequency_data.size())
-   {
-      i = std::distance(frequency_data.begin(), std::max_element(frequency_data.begin(), frequency_data.end()));
-   }
-
-   return getFrequency(i, frequency_data.size());
+   double magnitude = std::sqrt(real*real + imag*imag);
+   return magnitude;
 }

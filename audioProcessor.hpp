@@ -24,6 +24,7 @@ private:
    std::vector<complex> fft(std::span<const complex> x);
    std::vector<double> amplitudeToPower(std::span<const complex> amplitudes);
    double highestFrequency(std::span<const sf::Int16> samples);
+   double goertzel_mag(std::span<const double> samples, double frequency);
 
 
    static constexpr unsigned SAMPLE_RATE = 44100;
