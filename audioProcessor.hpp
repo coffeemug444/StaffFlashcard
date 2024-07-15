@@ -20,7 +20,7 @@ public:
    ~AudioProcessor() { stop(); }
 private:
 
-   double goertzel_mag(std::span<const double> samples, double frequency);
+   double goertzelMag(std::span<const double> samples, double frequency);
    static constexpr unsigned SAMPLE_RATE = 44100;
 
    std::function<void(Note)> m_on_note_guessed;

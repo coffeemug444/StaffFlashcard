@@ -34,32 +34,26 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
    for (int note = 0; note < 12*7; note++)
    {
       // 7 octaves of notes
-      bins.push_back(goertzel_mag(samples_double, lowest_frequency*std::pow(2.0, note/12.0)));
+      bins.push_back(goertzelMag(samples_double, lowest_frequency*std::pow(2.0, note/12.0)));
    }
+
+   auto harmonics = {
+      12,         // octave (12th fret harmonic)
+      12+7,       // octave + perfect 5th (7th fret harmonic)
+      2*12,       // 2 octaves (5th fret harmonic)
+      2*12 + 4,   // 2 octaves + major 3rd (9th fret harmonic)
+      2*12 + 7    // 2 octaves + perfect 5th (idk but I'm sure it's present somehow)
+   };
 
    for (int note = 0; note < bins.size(); note++)
    {
-      if ((note + 12) < bins.size())
+      for (auto harmonic : harmonics)
       {
-         bins.at(note) *= bins.at(note + 12);
+         if ((note + harmonic) < bins.size())
+         {
+            bins.at(note) *= bins.at(note + harmonic);
+         }
       }
-      if ((note + 12 + 7) < bins.size())
-      {
-         bins.at(note) *= bins.at(note + 12 + 7);
-      }
-      if ((note + 2*12) < bins.size())
-      {
-         bins.at(note) *= bins.at(note + 2*12);
-      }
-      if ((note + 2*12 + 4) < bins.size())
-      {
-         bins.at(note) *= bins.at(note + 2*12 + 4);
-      }
-      if ((note + 2*12 + 7) < bins.size())
-      {
-         bins.at(note) *= bins.at(note + 2*12 + 7);
-      }
-
    }
 
    Note note = static_cast<Note>(std::distance(bins.begin(), std::max_element(bins.begin(), bins.end())) % 12);
@@ -69,7 +63,7 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
    return true;
 }
 
-double AudioProcessor::goertzel_mag(std::span<const double> samples, double frequency)
+double AudioProcessor::goertzelMag(std::span<const double> samples, double frequency)
 {
    int k = std::round((samples.size() * frequency) / SAMPLE_RATE);
    double omega = (2.0 * M_PI * k) / samples.size();
