@@ -2,6 +2,8 @@
 #include <iostream>
 #include "staff.hpp"
 #include <utility>
+#include <tuple>
+#include <numeric>
 
 
 AudioProcessor::AudioProcessor(std::function<void(Note)> on_note_guessed)
@@ -80,22 +82,21 @@ double AudioProcessor::goertzelMag(std::span<const double> samples, double frequ
    double sine = sin(omega);
    double cosine = cos(omega);
    double coeff = 2.0 * cosine;
-   double q0=0;
-   double q1=0;
-   double q2=0;
 
-   for (double sample : samples)
-   {
-      q0 = coeff * q1 - q2 + sample;
-      q2 = q1;
-      q1 = q0;
-   }
+   using Q = std::pair<double,double>;
+   Q q = std::accumulate(samples.begin(), samples.end(), Q{0,0}, [&](const Q& q, double sample) {
+      return Q { 
+         coeff * q.first - q.second + sample, 
+         q.first 
+      };
+   });
 
    // calculate the real and imaginary results
    // scaling appropriately
-   double real = 2*(q1 - q2 * cosine) / samples.size();
-   double imag = 2*(q2 * sine) / samples.size();
+   double real = q.first - q.second * cosine;
+   double imag = q.second * sine;
+   double x = 8.0/(samples.size()*samples.size());
 
-   double magnitude = std::sqrt(real*real + imag*imag);
+   double magnitude = std::sqrt(x*(real*real + imag*imag));
    return magnitude;
 }
