@@ -56,12 +56,44 @@ void Staff::setRandomNote()
 {
    static std::random_device rd; // obtain a random number from hardware
    static std::mt19937 gen(rd()); // seed the generator
-   static std::uniform_int_distribution<> distr(-2, 3); // define the range
+   static std::uniform_int_distribution<> distr(-2, 5); // define the range
 
    static std::deque<int> prev_numbers;
 
+   const auto note_map = std::map<int, Note> {
+      {0, Note::E},
+      {1, Note::D},
+      {2, Note::C},
+      {3, Note::B},
+      {4, Note::A},
+      {5, Note::G},
+      {6, Note::F},
+   };
+
+   auto getNote = [note_map](int idx) -> Note {
+      while (idx < 0)
+      {
+         idx += 7;
+      }
+      return note_map.at(idx % 7);
+   };
+
+
+   auto sameAsLastNote = [getNote](int idx) {
+      if (prev_numbers.empty()) return false;
+      Note last = getNote(prev_numbers.back());
+      Note current = getNote(idx);
+      return last == current;
+   };
+
+   auto numWasRecent = [](int idx)
+   {
+      return std::find(prev_numbers.begin(), prev_numbers.end(), idx) != prev_numbers.end();
+   };
+
+
    int num = distr(gen);
-   while (std::find(prev_numbers.begin(), prev_numbers.end(), num) != prev_numbers.end())
+   while (numWasRecent(num) or sameAsLastNote(num))
    {
       num = distr(gen);
    }
@@ -74,26 +106,7 @@ void Staff::setRandomNote()
 
    drawNote(num);
 
-
-
-   int note_index = num;
-   while (note_index < 0)
-   {
-      note_index += 7;
-   }
-   note_index = note_index % 7;
-
-   const auto note_map = std::map<int, Note> {
-      {0, Note::E},
-      {1, Note::D},
-      {2, Note::C},
-      {3, Note::B},
-      {4, Note::A},
-      {5, Note::G},
-      {6, Note::F},
-   };
-
-   m_current_note = note_map.at(note_index);
+   m_current_note = getNote(num);
 }
 
 void Staff::guessNote(Note note)
