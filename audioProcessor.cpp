@@ -55,20 +55,11 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
       }
    }
 
-   std::vector<double> restricted_bins { bins.begin(), bins.begin() + 12 };
-   for (int octave = 1; octave < 7; octave++)
-   {
-      for (int note_idx = 0; note_idx < 12; note_idx++)
-      {
-         restricted_bins.at(note_idx) *= bins.at(12*octave + note_idx);
-      }
-   }
+   auto best_note = std::max_element(bins.begin(), bins.end());
 
-   auto best_note = std::max_element(restricted_bins.begin(), restricted_bins.end());
+   if (*best_note < 500) return true;
 
-   if ((*best_note / total_power) < 1000) return true;
-
-   Note note = static_cast<Note>(std::distance(restricted_bins.begin(), best_note));
+   Note note = static_cast<Note>(std::distance(bins.begin(), best_note) % 12);
 
    m_on_note_guessed(note);
 
