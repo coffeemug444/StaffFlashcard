@@ -56,7 +56,14 @@ void Staff::setRandomNote()
 {
    static std::random_device rd; // obtain a random number from hardware
    static std::mt19937 gen(rd()); // seed the generator
-   static std::uniform_int_distribution<> distr(-2, 5); // define the range
+
+   // -2, -1,  0  | high e
+   //  1,  2,  3  | B
+   //  4,  5      | G
+   //  6,  7,  8  | D
+   //  9, 10, 11  | A
+   // 12, 13, 14  | low E
+   static std::uniform_int_distribution<> distr(-2, 8); // define the range
 
    static std::deque<int> prev_numbers;
 
