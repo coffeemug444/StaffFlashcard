@@ -1,7 +1,6 @@
 #include "staff.hpp"
 #include <random>
 #include <deque>
-#include <iostream>
 #include <map>
 
 Staff::Staff(float height)
@@ -11,12 +10,20 @@ Staff::Staff(float height)
    ,m_font{}
    ,m_cleff{L"\U0001D11E", m_font, static_cast<unsigned>(height)}
    ,m_lines{L"\U0001D11A\U0001D11A", m_font, static_cast<unsigned>(height)}
+   ,m_extended_down_1_staff{L"\U0001D116", m_font, static_cast<unsigned>(height)}
+   ,m_extended_down_2_staff{L"\U0001D117", m_font, static_cast<unsigned>(height)}
    ,m_note{L"\U0001D15D", m_font, static_cast<unsigned>(height)}
+   ,m_draw_extended_down_1_staff{false}
+   ,m_draw_extended_down_2_staff{false}
    ,m_display_note{false}
 {
    m_font.loadFromFile("font.ttf");
    m_cleff.move(height*.8,-height*.2); // lol
    m_lines.move(0,-height*.2); // lol
+   m_extended_down_1_staff.move(height*.8,height*.635); // lol
+   m_extended_down_1_staff.setScale({0.5, 1.0});
+   m_extended_down_2_staff.move(height*.8,height*.635); // lol
+   m_extended_down_2_staff.setScale({0.5, 1.0});
    m_note.move(0,-height*.2); // lol
 
    setRandomNote();
@@ -35,7 +42,9 @@ void Staff::move(float x, float y)
 
    m_cleff.move(d);
    m_lines.move(d);
-   m_note.move(d.x,d.y);
+   m_extended_down_1_staff.move(d);
+   m_extended_down_2_staff.move(d);
+   m_note.move(d);
 }
 
 void Staff::clearNote()
@@ -63,7 +72,7 @@ void Staff::setRandomNote()
    //  6,  7,  8  | D
    //  9, 10, 11  | A
    // 12, 13, 14  | low E
-   static std::uniform_int_distribution<> distr(-2, 8); // define the range
+   static std::uniform_int_distribution<> distr(-2, 11); // define the range
 
    static std::deque<int> prev_numbers;
 
@@ -114,6 +123,9 @@ void Staff::setRandomNote()
    drawNote(num);
 
    m_current_note = getNote(num);
+
+   m_draw_extended_down_2_staff = num >= 11;
+   m_draw_extended_down_1_staff = not m_draw_extended_down_2_staff and num >= 9;
 }
 
 void Staff::guessNote(Note note)
@@ -133,4 +145,13 @@ void Staff::draw(sf::RenderTarget& target, sf::RenderStates /*states*/) const
 
    target.draw(m_cleff);
    target.draw(m_lines);
+
+   if (m_draw_extended_down_1_staff)
+   {
+      target.draw(m_extended_down_1_staff);
+   }
+   if (m_draw_extended_down_2_staff)
+   {
+      target.draw(m_extended_down_2_staff);
+   }
 }
