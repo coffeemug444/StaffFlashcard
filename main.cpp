@@ -64,11 +64,11 @@ void Main::onNoteGuessed(Note note)
 
 Main::Main()
    :m_window{}
-   ,m_staff{100}
+   ,m_staff{200}
    ,m_audio_processor{std::bind(&Main::onNoteGuessed, this, std::placeholders::_1)}
 {
    setupAudio();
-   m_window = std::make_unique<sf::RenderWindow>(sf::VideoMode(150, 140), "Staff flashcard");
+   m_window = std::make_unique<sf::RenderWindow>(sf::VideoMode(270, 280), "Staff flashcard");
 }
 
 void Main::loop()
