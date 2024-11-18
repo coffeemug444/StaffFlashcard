@@ -55,15 +55,10 @@ void Main::setupAudio()
    m_audio_processor.start();
 }
 
-void Main::onNoteGuessed(Note note)
-{
-   m_staff.guessNote(note);
-}
-
 Main::Main()
    :m_window{}
    ,m_staff{200}
-   ,m_audio_processor{std::bind(&Main::onNoteGuessed, this, std::placeholders::_1)}
+   ,m_audio_processor{std::bind(&Staff::guessNote, &m_staff, std::placeholders::_1)}
 {
    setupAudio();
    m_window = std::make_unique<sf::RenderWindow>(sf::VideoMode(270, 280), "Staff flashcard");

@@ -9,11 +9,11 @@ Staff::Staff(float height)
    ,m_y1{-height*0.87f}
    ,m_note_height{height*.167f}
    ,m_font{}
-   ,m_cleff{L"\U0001D11E", m_font, static_cast<unsigned>(height)}
-   ,m_lines{L"\U0001D11A\U0001D11A", m_font, static_cast<unsigned>(height)}
-   ,m_extended_down_1_staff{L"\U0001D116", m_font, static_cast<unsigned>(height)}
-   ,m_extended_down_2_staff{L"\U0001D117", m_font, static_cast<unsigned>(height)}
-   ,m_note{L"\U0001D15D", m_font, static_cast<unsigned>(height)}
+   ,m_cleff{std::wstring{CLEF}, m_font, static_cast<unsigned>(height)}
+   ,m_lines{std::wstring(2, STAFF), m_font, static_cast<unsigned>(height)}
+   ,m_extended_down_1_staff{std::wstring{STAFF_SINGLE}, m_font, static_cast<unsigned>(height)}
+   ,m_extended_down_2_staff{std::wstring{STAFF_DOUBLE}, m_font, static_cast<unsigned>(height)}
+   ,m_note{std::wstring{WHOLE_NOTE}, m_font, static_cast<unsigned>(height)}
    ,m_draw_extended_down_1_staff{false}
    ,m_draw_extended_down_2_staff{false}
    ,m_display_note{false}

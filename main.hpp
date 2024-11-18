@@ -13,7 +13,6 @@ public:
 
    void loop();
 private:
-   void onNoteGuessed(Note note);
    void pollEvents();
    void setupAudio();
 
