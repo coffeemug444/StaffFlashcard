@@ -18,7 +18,7 @@ public:
 
    void guessNote(Note note);
 private:
-   void drawNote(int position);
+   void drawNote(int position, NoteModifier modifier);
 
    void setRandomNote();
    float noteHeight() { return m_height*0.135; };
@@ -46,6 +46,7 @@ private:
    sf::Text m_extended_down_1_staff;
    sf::Text m_extended_down_2_staff;
    sf::Text m_note;
+   sf::Text m_modifier;
 
    bool m_draw_extended_down_1_staff;
    bool m_draw_extended_down_2_staff;
