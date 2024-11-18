@@ -1,8 +1,9 @@
 #pragma once
-#include "staff.hpp"
+
 #include "audioProcessor.hpp"
+#include "staff.hpp"
+
 #include <SFML/Graphics.hpp>
-#include <optional>
 #include <memory>
 
 class Main

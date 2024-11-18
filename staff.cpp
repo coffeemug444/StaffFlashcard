@@ -1,7 +1,8 @@
 #include "staff.hpp"
-#include <random>
+
 #include <deque>
 #include <map>
+#include <random>
 
 Staff::Staff(float height)
    :m_height{height}

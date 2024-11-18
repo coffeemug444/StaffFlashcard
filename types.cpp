@@ -1,6 +1,6 @@
 #include "types.hpp"
 
-
+#include <ostream>
 
 Note getNoteFromIndex(int index)
 {

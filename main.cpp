@@ -1,16 +1,14 @@
+#include "main.hpp"
+
+#include "audioProcessor.hpp"
+#include "staff.hpp"
+
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <cmath>
-#include <random>
-#include <deque>
-#include "staff.hpp"
 #include <complex>
-#include <SFML/Audio.hpp>
-#include <cmath>
-#include <iostream>
-#include <span>
-#include "audioProcessor.hpp"
-#include "main.hpp"
 #include <functional>
+#include <iostream>
 
 using complex = std::complex<double>;
 

@@ -1,10 +1,7 @@
 #include "audioProcessor.hpp"
-#include <iostream>
-#include "staff.hpp"
-#include <utility>
-#include <tuple>
-#include <numeric>
 
+#include <numeric>
+#include <utility>
 
 AudioProcessor::AudioProcessor(std::function<void(Note)> on_note_guessed)
    :m_on_note_guessed{on_note_guessed}
@@ -57,7 +54,7 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
 
    auto best_note = std::max_element(bins.begin(), bins.end());
 
-   if (*best_note < 500) return true;
+   if (*best_note < 800) return true;
 
    Note note = static_cast<Note>(std::distance(bins.begin(), best_note) % 12);
 

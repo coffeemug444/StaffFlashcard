@@ -1,11 +1,11 @@
 #pragma once
-#include <SFML/Audio.hpp>
-#include <vector>
-#include <span>
-#include <complex>
-#include <optional>
-#include <functional>
+
 #include "types.hpp"
+
+#include <SFML/Audio.hpp>
+#include <complex>
+#include <functional>
+#include <span>
 
 using complex = std::complex<double>;
 

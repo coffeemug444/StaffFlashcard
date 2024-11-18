@@ -10,10 +10,11 @@ Arch: `sudo pacman -S sfml`
 
 Ubuntu: `sudo apt install libsfml-dev`
 
-Then run `make` to create the `main` file
+Generate the build files and build the project:
+`mkdir build && cd build && cmake .. && cmake --build .`
 
 # Usage #
-run `./main` in your terminal. This will prompt you to select the microphone you wish to use, ie.
+Navigate to the build directory and run `./StaffFlashcard` in your terminal. This will prompt you to select the microphone you wish to use, ie.
 
 ```
 $ ./main

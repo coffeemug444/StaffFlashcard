@@ -1,6 +1,8 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+
 #include "types.hpp"
+
+#include <SFML/Graphics.hpp>
 
 class Staff : public sf::Drawable
 {
