@@ -61,7 +61,7 @@ Main::Main()
    ,m_audio_processor{std::bind(&Staff::guessNote, &m_staff, std::placeholders::_1)}
 {
    setupAudio();
-   m_window = std::make_unique<sf::RenderWindow>(sf::VideoMode(270, 280), "Staff flashcard");
+   m_window = std::make_unique<sf::RenderWindow>(sf::VideoMode(270, 330), "Staff flashcard");
 }
 
 void Main::loop()

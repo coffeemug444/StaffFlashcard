@@ -21,11 +21,11 @@ Staff::Staff(float height)
    ,m_display_note{false}
 {
    m_font.loadFromFile("font.ttf");
-   m_cleff.move(height*.8,-height*.2); // lol
-   m_lines.move(0,-height*.2); // lol
-   m_extended_down_1_staff.move(height*.5,height*.635); // lol
+   m_cleff.setPosition(height*.8,height*.1); // lol
+   m_lines.setPosition(0,height*.1); // lol
+   m_extended_down_1_staff.setPosition(height*.5,height*.935); // lol
    m_extended_down_1_staff.setScale({0.8, 1.0});
-   m_extended_down_2_staff.move(height*.5,height*.635); // lol
+   m_extended_down_2_staff.setPosition(height*.5,height*.935); // lol
    m_extended_down_2_staff.setScale({0.8, 1.0});
 
    setRandomNote();
@@ -58,7 +58,7 @@ void Staff::clearNote()
 void Staff::drawNote(int position, NoteModifier modifier)
 {
    float x = m_position.x + m_height*0.4;
-   float y = m_position.y + m_y1 + position*m_note_height/2;
+   float y = m_position.y + m_y1 + position*m_note_height/2 + m_height*.3;
 
    switch(modifier)
    {
@@ -136,7 +136,7 @@ void Staff::setRandomNote()
    {
       num = distr(gen);
       modifier = static_cast<NoteModifier>(offset_distr(gen));
-      int idx = static_cast<int>(getNote(num)) + static_cast<int>(modifier);
+      int idx = static_cast<int>(getNote(num)) + static_cast<int>(modifier) + 12;
       m_current_note = static_cast<Note>(idx % 12);
    }
    while (numWasRecent(num) or m_current_note == last_note);
