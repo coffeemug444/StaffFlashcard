@@ -4,19 +4,18 @@
 #include "staff.hpp"
 
 #include <SFML/Graphics.hpp>
-#include <memory>
+#include <string>
 
 class Main
 {
 public:
-   Main();
+   Main(const std::string& audio_device);
 
    void loop();
 private:
    void pollEvents();
-   void setupAudio();
 
-   std::unique_ptr<sf::RenderWindow> m_window;
+   sf::RenderWindow m_window;
    Staff m_staff;
    AudioProcessor m_audio_processor;
 };
