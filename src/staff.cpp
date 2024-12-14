@@ -1,9 +1,13 @@
 #include "staff.hpp"
 #include "types.hpp"
 
+#include <SFML/Graphics/Color.hpp>
 #include <deque>
 #include <map>
 #include <random>
+
+
+
 
 Staff::Staff(float height)
    :m_height{height}
@@ -14,19 +18,33 @@ Staff::Staff(float height)
    ,m_lines{std::wstring(2, STAFF), m_font, static_cast<unsigned>(height)}
    ,m_extended_down_1_staff{std::wstring{STAFF_SINGLE}, m_font, static_cast<unsigned>(height)}
    ,m_extended_down_2_staff{std::wstring{STAFF_DOUBLE}, m_font, static_cast<unsigned>(height)}
+   ,m_extended_up_1_staff{std::wstring{STAFF_SINGLE}, m_font, static_cast<unsigned>(height)}
+   ,m_extended_up_2_staff{std::wstring{STAFF_DOUBLE}, m_font, static_cast<unsigned>(height)}
+   ,m_extended_up_3_staff{std::wstring{STAFF_TRIPLE}, m_font, static_cast<unsigned>(height)}
    ,m_note{std::wstring{' '} + WHOLE_NOTE, m_font, static_cast<unsigned>(height)}
    ,m_modifier{std::wstring{' '}, m_font, static_cast<unsigned>(height*.8)}
    ,m_draw_extended_down_1_staff{false}
    ,m_draw_extended_down_2_staff{false}
+   ,m_draw_extended_up_1_staff{false}
+   ,m_draw_extended_up_2_staff{false}
+   ,m_draw_extended_up_3_staff{false}
    ,m_display_note{false}
 {
    m_font.loadFromFile("font.ttf");
-   m_cleff.setPosition(height*.8,height*.1); // lol
-   m_lines.setPosition(0,height*.1); // lol
-   m_extended_down_1_staff.setPosition(height*.5,height*.935); // lol
+   m_cleff.setPosition(height*.8,height*.35); // lol
+
+   m_lines.setPosition(0,height*.35); // lol
+   m_extended_down_1_staff.setPosition(height*.5,height*1.185); // lol
    m_extended_down_1_staff.setScale({0.8, 1.0});
-   m_extended_down_2_staff.setPosition(height*.5,height*.935); // lol
+   m_extended_down_2_staff.setPosition(height*.5,height*1.185); // lol
    m_extended_down_2_staff.setScale({0.8, 1.0});
+   
+   m_extended_up_1_staff.setPosition(height*.5, height*0.170);
+   m_extended_up_1_staff.setScale({0.8, 1.0});
+   m_extended_up_2_staff.setPosition(height*.5, height*0.005);
+   m_extended_up_2_staff.setScale({0.8, 1.0});
+   m_extended_up_3_staff.setPosition(height*.5, -height*0.160);
+   m_extended_up_3_staff.setScale({0.8, 1.0});
 
    setRandomNote();
 }
@@ -58,7 +76,7 @@ void Staff::clearNote()
 void Staff::drawNote(int position, NoteModifier modifier)
 {
    float x = m_position.x + m_height*0.4;
-   float y = m_position.y + m_y1 + position*m_note_height/2 + m_height*.3;
+   float y = m_position.y + m_y1 + position*m_note_height/2 + m_height*.55;
 
    switch(modifier)
    {
@@ -86,13 +104,12 @@ void Staff::setRandomNote()
    static std::mt19937 gen(rd()); // seed the generator
 
    // -2, -1,  0  | high e
-   //  1,  2,  3  | B
-   //  4,  5      | G
-   //  6,  7,  8  | D
-   //  9, 10, 11  | A
-   // 12, 13, 14  | low E
+   //  1,  2,  3  | B     
+   //  4,  5      | G     
+   //  6,  7,  8  | D     
+   //  9, 10, 11  | A     
+   // 12, 13, 14  | low E 
    static std::uniform_int_distribution<> distr(-2, 11); // define the range of strings
-
    static std::uniform_int_distribution<> offset_distr(-1, 1); // define the range for flats/sharps/naturals
 
    static std::deque<int> prev_numbers;
@@ -149,8 +166,11 @@ void Staff::setRandomNote()
 
    drawNote(num, modifier);
 
-   m_draw_extended_down_2_staff = num >= 11;
-   m_draw_extended_down_1_staff = not m_draw_extended_down_2_staff and num >= 9;
+   m_draw_extended_down_2_staff = 11 <= num && num <  13;
+   m_draw_extended_down_1_staff =  9 <= num && num <  11;
+   m_draw_extended_up_1_staff   = -5 <  num && num <= -3;
+   m_draw_extended_up_2_staff   = -7 <  num && num <= -5;
+   m_draw_extended_up_3_staff   = -9 <  num && num <= -7;
 }
 
 void Staff::guessNote(Note note)
@@ -179,5 +199,17 @@ void Staff::draw(sf::RenderTarget& target, sf::RenderStates /*states*/) const
    if (m_draw_extended_down_2_staff)
    {
       target.draw(m_extended_down_2_staff);
+   }
+   if (m_draw_extended_up_1_staff)
+   {
+      target.draw(m_extended_up_1_staff);
+   }
+   if (m_draw_extended_up_2_staff)
+   {
+      target.draw(m_extended_up_2_staff);
+   }
+   if (m_draw_extended_up_3_staff)
+   {
+      target.draw(m_extended_up_3_staff);
    }
 }

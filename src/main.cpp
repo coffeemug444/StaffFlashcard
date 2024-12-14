@@ -51,7 +51,7 @@ void Main::pickAudioDevice(int idx)
    if (not m_audio_processor.setDevice(m_audio_devices.at(idx))) return;
    m_audio_processor.start();
 
-   setWindowSize({270, 330});
+   setWindowSize({270, 360});
    m_stage = Stage::RUNNING;
 }
 
@@ -63,7 +63,7 @@ void Main::setWindowSize(const sf::Vector2f& size)
 }
 
 Main::Main()
-   :m_window{sf::VideoMode(270, 330), "Staff flashcard"}
+   :m_window{sf::VideoMode(1, 1), "Staff flashcard"}
    ,m_staff{200}
    ,m_audio_processor{std::bind(&Staff::guessNote, &m_staff, std::placeholders::_1)}
    ,m_stage{Stage::SETUP}

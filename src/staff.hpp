@@ -30,6 +30,7 @@ private:
    constexpr static inline wchar_t STAFF = L'\U0001D11A';         // 𝄚
    constexpr static inline wchar_t STAFF_SINGLE = L'\U0001D116';  // 𝄖
    constexpr static inline wchar_t STAFF_DOUBLE = L'\U0001D117';  // 𝄗
+   constexpr static inline wchar_t STAFF_TRIPLE = L'\U0001D118';  // 𝄘
 
    Note m_current_note;
    sf::Vector2f m_position;
@@ -45,11 +46,17 @@ private:
    sf::Text m_lines;
    sf::Text m_extended_down_1_staff;
    sf::Text m_extended_down_2_staff;
+   sf::Text m_extended_up_1_staff;
+   sf::Text m_extended_up_2_staff;
+   sf::Text m_extended_up_3_staff;
    sf::Text m_note;
    sf::Text m_modifier;
 
    bool m_draw_extended_down_1_staff;
    bool m_draw_extended_down_2_staff;
+   bool m_draw_extended_up_1_staff;
+   bool m_draw_extended_up_2_staff;
+   bool m_draw_extended_up_3_staff;
 
    bool m_display_note;
 
