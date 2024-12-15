@@ -2,6 +2,7 @@
 
 #include "audioProcessor.hpp"
 #include "staff.hpp"
+#include "staffSetup.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -16,16 +17,21 @@ public:
    void loop();
 private:
    enum class Stage {
-      SETUP,
+      AUDIO_SETUP,
+      NOTES_SETUP,
       RUNNING
    };
 
    void pollEvents();
    void pickAudioDevice(int idx);
    void setWindowSize(const sf::Vector2f& size);
+   
+   void gotoNotesSetup();
+   void gotoRunning(const std::vector<BetterNote>& notes);
 
    sf::RenderWindow m_window;
    Staff m_staff;
+   StaffSetup m_staff_setup;
    AudioProcessor m_audio_processor;
    Stage m_stage;
    

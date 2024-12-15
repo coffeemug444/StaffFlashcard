@@ -2,11 +2,14 @@
 
 #include "audioProcessor.hpp"
 #include "staff.hpp"
+#include "types.hpp"
 
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/Window/WindowStyle.hpp>
 #include <cmath>
 #include <complex>
 #include <functional>
@@ -32,12 +35,36 @@ void Main::pollEvents() {
          break;
       case sf::Event::TextEntered:
       {
-         if (m_stage != Stage::SETUP) break;
+         if (m_stage != Stage::AUDIO_SETUP) break;
          if (event.text.unicode >= 128) break;
          char c = event.text.unicode;
          if (c < '0' or c > '9') break;
          pickAudioDevice(c - '0');
       }
+      case sf::Event::MouseMoved:
+      {
+         if (m_stage != Stage::NOTES_SETUP) break;
+         sf::Vector2f pos = {static_cast<float>(event.mouseMove.x), static_cast<float>(event.mouseMove.y)};
+         m_staff_setup.mouseMoved(pos);
+         break;
+      }
+      case sf::Event::MouseButtonPressed:
+      {
+         if (m_stage != Stage::NOTES_SETUP) break;
+         if (event.mouseButton.button != sf::Mouse::Button::Left) break;
+         sf::Vector2f pos = {static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)};
+         m_staff_setup.mouseDown(pos);
+         break;
+      }
+      case sf::Event::MouseButtonReleased:
+      {
+         if (m_stage != Stage::NOTES_SETUP) break;
+         if (event.mouseButton.button != sf::Mouse::Button::Left) break;
+         sf::Vector2f pos = {static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)};
+         m_staff_setup.mouseUp(pos);
+         break;
+      }
+
       default:
          break;
       }
@@ -51,7 +78,19 @@ void Main::pickAudioDevice(int idx)
    if (not m_audio_processor.setDevice(m_audio_devices.at(idx))) return;
    m_audio_processor.start();
 
+   gotoNotesSetup();
+}
+
+void Main::gotoNotesSetup()
+{
+   setWindowSize({760, 340});
+   m_stage = Stage::NOTES_SETUP;
+}
+
+void Main::gotoRunning(const std::vector<BetterNote>& notes)
+{
    setWindowSize({270, 360});
+   m_staff.setNotes(notes);
    m_stage = Stage::RUNNING;
 }
 
@@ -63,10 +102,11 @@ void Main::setWindowSize(const sf::Vector2f& size)
 }
 
 Main::Main()
-   :m_window{sf::VideoMode(1, 1), "Staff flashcard"}
+   :m_window{sf::VideoMode(1, 1), "Staff flashcard", sf::Style::Default ^ sf::Style::Resize}
    ,m_staff{200}
+   ,m_staff_setup{std::bind(&Main::gotoRunning, this, std::placeholders::_1)}
    ,m_audio_processor{std::bind(&Staff::guessNote, &m_staff, std::placeholders::_1)}
-   ,m_stage{Stage::SETUP}
+   ,m_stage{Stage::AUDIO_SETUP}
    ,m_font{[](){ sf::Font font; font.loadFromFile("font.ttf"); return font; }()}
    ,m_audio_devices{AudioProcessor::getAvailableDevices()}
    ,m_audio_devices_text(
@@ -95,8 +135,11 @@ void Main::loop()
       m_window.clear();
       switch (m_stage)
       {
-      case Stage::SETUP:
+      case Stage::AUDIO_SETUP:
          m_window.draw(m_audio_devices_text);
+         break;
+      case Stage::NOTES_SETUP:
+         m_window.draw(m_staff_setup);
          break;
       case Stage::RUNNING:
          m_window.draw(m_staff);

@@ -3,8 +3,8 @@
 #include <numeric>
 #include <utility>
 
-AudioProcessor::AudioProcessor(std::function<void(Note)> on_note_guessed)
-   :m_on_note_guessed{on_note_guessed}
+AudioProcessor::AudioProcessor(std::function<void(int)> on_tone_index_guessed)
+   :m_on_tone_index_guessed{on_tone_index_guessed}
 {
    setProcessingInterval(sf::milliseconds(200));
 }
@@ -56,9 +56,9 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
 
    if (*best_note < 800) return true;
 
-   Note note = static_cast<Note>(std::distance(bins.begin(), best_note) % 12);
+   int tone_index = std::distance(bins.begin(), best_note) % 12;
 
-   m_on_note_guessed(note);
+   m_on_tone_index_guessed(tone_index);
 
    return true;
 }

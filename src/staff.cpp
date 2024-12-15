@@ -10,8 +10,9 @@
 
 
 Staff::Staff(float height)
-   :m_height{height}
-   ,m_y1{-height*0.87f}
+   :m_selectable_notes{}
+   ,m_height{height}
+   ,m_y1{height*0.05f}
    ,m_note_height{height*.167f}
    ,m_font{}
    ,m_cleff{std::wstring{CLEF}, m_font, static_cast<unsigned>(height)}
@@ -45,8 +46,6 @@ Staff::Staff(float height)
    m_extended_up_2_staff.setScale({0.8, 1.0});
    m_extended_up_3_staff.setPosition(height*.5, -height*0.160);
    m_extended_up_3_staff.setScale({0.8, 1.0});
-
-   setRandomNote();
 }
 
 void Staff::setPos(float x, float y)
@@ -73,12 +72,20 @@ void Staff::clearNote()
    m_display_note = false;
 }
 
-void Staff::drawNote(int position, NoteModifier modifier)
+void Staff::setNotes(const std::vector<BetterNote>& notes)
 {
-   float x = m_position.x + m_height*0.4;
-   float y = m_position.y + m_y1 + position*m_note_height/2 + m_height*.55;
+   m_selectable_notes = notes;
+   setRandomNote();
+}
 
-   switch(modifier)
+void Staff::drawCurrentNote()
+{
+   int position = mapNoteToStaffIndex(m_current_note);
+
+   float x = m_position.x + m_height*0.4;
+   float y = m_position.y + m_y1 - position*m_note_height/2 + m_height*.55;
+
+   switch(getModifier(m_current_note.first))
    {
    case NoteModifier::FLAT:
       m_modifier.setString(std::wstring{FLAT});
@@ -96,6 +103,12 @@ void Staff::drawNote(int position, NoteModifier modifier)
    m_display_note = true;
 
    m_note.setPosition(x,y);
+
+   m_draw_extended_down_2_staff = position == 0;
+   m_draw_extended_down_1_staff =  0 < position && position <=  2;
+   m_draw_extended_up_1_staff   = 13 < position && position <= 15;
+   m_draw_extended_up_2_staff   = 15 < position && position <= 17;
+   m_draw_extended_up_3_staff   = 17 < position && position <= 19;
 }
 
 void Staff::setRandomNote()
@@ -103,79 +116,39 @@ void Staff::setRandomNote()
    static std::random_device rd; // obtain a random number from hardware
    static std::mt19937 gen(rd()); // seed the generator
 
-   // -2, -1,  0  | high e
-   //  1,  2,  3  | B     
-   //  4,  5      | G     
-   //  6,  7,  8  | D     
-   //  9, 10, 11  | A     
-   // 12, 13, 14  | low E 
-   static std::uniform_int_distribution<> distr(-2, 11); // define the range of strings
-   static std::uniform_int_distribution<> offset_distr(-1, 1); // define the range for flats/sharps/naturals
+   std::uniform_int_distribution<> note_distr(0, m_selectable_notes.size() - 1);
+   std::uniform_int_distribution<> octave_distr(0, 2);
 
-   static std::deque<int> prev_numbers;
+   static std::vector<NoteOctave> prev_notes (3,{BetterNote::A,-1});
 
-   const auto note_map = std::map<int, Note> {
-      {0, Note::E},
-      {1, Note::D},
-      {2, Note::C},
-      {3, Note::B},
-      {4, Note::A},
-      {5, Note::G},
-      {6, Note::F},
-   };
-
-   auto getNote = [note_map](int idx) -> Note {
-      while (idx < 0)
-      {
-         idx += 7;
-      }
-      return note_map.at(idx % 7);
-   };
-
-
-   auto sameAsLastNote = [getNote](int idx) {
-      if (prev_numbers.empty()) return false;
-      Note last = getNote(prev_numbers.back());
-      Note current = getNote(idx);
-      return last == current;
-   };
-
-   auto numWasRecent = [](int idx)
+   auto numWasRecent = [](const NoteOctave& note)
    {
-      return std::find(prev_numbers.begin(), prev_numbers.end(), idx) != prev_numbers.end();
+      return ;
    };
 
-
-   auto last_note = m_current_note;
-   int num{};
+   NoteOctave last_note = m_current_note;
    NoteModifier modifier{};
-   do 
+   while (true) 
    {
-      num = distr(gen);
-      modifier = static_cast<NoteModifier>(offset_distr(gen));
-      int idx = static_cast<int>(getNote(num)) + static_cast<int>(modifier) + 12;
-      m_current_note = static_cast<Note>(idx % 12);
-   }
-   while (numWasRecent(num) or m_current_note == last_note);
+      BetterNote note = m_selectable_notes.at(note_distr(gen));
+      m_current_note = {note, octave_distr(gen)};
 
-   prev_numbers.push_back(num);
-   while(prev_numbers.size() > 2)
-   {
-      prev_numbers.pop_front();
+      if (mapNoteToStaffIndex(m_current_note) > 18) continue;  // off the staff
+      if (std::ranges::contains(prev_notes, m_current_note)) continue;  // too recent
+      if (mapNoteToToneIndex(m_current_note) == mapNoteToToneIndex(last_note)) continue;  // equivalent note
+
+      break;
    }
 
-   drawNote(num, modifier);
+   std::ranges::rotate(prev_notes, std::prev(end(prev_notes)));
+   prev_notes.front() = m_current_note;
 
-   m_draw_extended_down_2_staff = 11 <= num && num <  13;
-   m_draw_extended_down_1_staff =  9 <= num && num <  11;
-   m_draw_extended_up_1_staff   = -5 <  num && num <= -3;
-   m_draw_extended_up_2_staff   = -7 <  num && num <= -5;
-   m_draw_extended_up_3_staff   = -9 <  num && num <= -7;
+   drawCurrentNote();
 }
 
-void Staff::guessNote(Note note)
+void Staff::guessNote(int tone_index)
 {
-   if (note == m_current_note)
+   if (tone_index == mapNoteToToneIndex(m_current_note))
    {
       setRandomNote();
    }
