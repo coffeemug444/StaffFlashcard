@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <utility>
+#include <ostream>
 
 int mapNoteToStaffIndex(NoteOctave note_octave)
 {
@@ -11,7 +12,7 @@ int mapNoteToStaffIndex(NoteOctave note_octave)
 
    switch (note)
    {
-      using enum BetterNote;
+      using enum Note;
       case Ab:
       case A:
       case As:
@@ -51,7 +52,7 @@ int mapNoteToToneIndex(NoteOctave note_octave)
 
    switch (note)
    {
-      using enum BetterNote;
+      using enum Note;
       case A : return 0;
       case As: return 1;
       case Bb: return 1;
@@ -77,7 +78,7 @@ int mapNoteToToneIndex(NoteOctave note_octave)
    std::unreachable();
 }
 
-NoteModifier getModifier(BetterNote note)
+NoteModifier getModifier(Note note)
 {
    int note_as_num = static_cast<int>(note);
    switch (note_as_num % 3)
@@ -89,16 +90,16 @@ NoteModifier getModifier(BetterNote note)
    std::unreachable();
 }
 
-std::vector<BetterNote> getAllNotes()
+std::vector<Note> getAllNotes()
 {
-   using enum BetterNote;
+   using enum Note;
 
    return {Ab, A, As, Bb, B, Bs, Cb, C, Cs, Db, D, Ds, Eb, E, Es, Fb, F, Fs, Gb, G, Gs};
 }
 
-std::vector<BetterNote> getNotesForKey(BetterNote note, Key key)
+std::vector<Note> getNotesForKey(Note note, Key key)
 {
-   using enum BetterNote;
+   using enum Note;
    
    const static std::vector a_major = {A , B , Cs, D , E , Fs, Gs};
    const static std::vector b_major = {B , Cs, Ds, E , Fs, Gs, As};
@@ -215,3 +216,32 @@ std::vector<BetterNote> getNotesForKey(BetterNote note, Key key)
    std::unreachable();
 }
 
+std::ostream & operator<<(std::ostream &out, Note note)
+{
+   using enum Note;
+   switch (note)
+   {
+   case Ab: return out << "Ab";
+   case A : return out << "A" ;
+   case As: return out << "As";
+   case Bb: return out << "Bb";
+   case B : return out << "B" ;
+   case Bs: return out << "Bs";
+   case Cb: return out << "Cb";
+   case C : return out << "C" ;
+   case Cs: return out << "Cs";
+   case Db: return out << "Db";
+   case D : return out << "D" ;
+   case Ds: return out << "Ds";
+   case Eb: return out << "Eb";
+   case E : return out << "E" ;
+   case Es: return out << "Es";
+   case Fb: return out << "Fb";
+   case F : return out << "F" ;
+   case Fs: return out << "Fs";
+   case Gb: return out << "Gb";
+   case G : return out << "G" ;
+   case Gs: return out << "Gs";
+   }
+   return out;
+}

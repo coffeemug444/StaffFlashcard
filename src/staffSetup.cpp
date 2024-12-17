@@ -7,39 +7,39 @@
 #include <ranges>
 
 
-StaffSetup::StaffSetup(std::function<void(const std::vector<BetterNote>&)> pick_notes)
+StaffSetup::StaffSetup(std::function<void(const std::vector<Note>&)> pick_notes)
    :m_pick_notes{pick_notes}
    ,m_major_buttons{
-      {"C major", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::C, Key::MAJOR));}},
-      {"D major", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::D, Key::MAJOR));}},
-      {"E major", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::E, Key::MAJOR));}},
-      {"F major", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::F, Key::MAJOR));}},
-      {"G major", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::G, Key::MAJOR));}},
-      {"A major", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::A, Key::MAJOR));}}
+      {"C major", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::C, Key::MAJOR));}},
+      {"D major", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::D, Key::MAJOR));}},
+      {"E major", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::E, Key::MAJOR));}},
+      {"F major", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::F, Key::MAJOR));}},
+      {"G major", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::G, Key::MAJOR));}},
+      {"A major", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::A, Key::MAJOR));}}
    }
    ,m_minor_buttons{
-      {"c minor", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::C, Key::MINOR));}},
-      {"d minor", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::D, Key::MINOR));}},
-      {"e minor", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::E, Key::MINOR));}},
-      {"f minor", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::F, Key::MINOR));}},
-      {"g minor", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::G, Key::MINOR));}},
-      {"a minor", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::A, Key::MINOR));}}
+      {"c minor", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::C, Key::MINOR));}},
+      {"d minor", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::D, Key::MINOR));}},
+      {"e minor", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::E, Key::MINOR));}},
+      {"f minor", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::F, Key::MINOR));}},
+      {"g minor", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::G, Key::MINOR));}},
+      {"a minor", {100.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::A, Key::MINOR));}}
    }
    ,m_major_pentatonic_buttons{
-      {"C major pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::C, Key::MAJOR_PENTATONIC));}},
-      {"D major pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::D, Key::MAJOR_PENTATONIC));}},
-      {"E major pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::E, Key::MAJOR_PENTATONIC));}},
-      {"F major pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::F, Key::MAJOR_PENTATONIC));}},
-      {"G major pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::G, Key::MAJOR_PENTATONIC));}},
-      {"A major pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::A, Key::MAJOR_PENTATONIC));}}
+      {"C major pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::C, Key::MAJOR_PENTATONIC));}},
+      {"D major pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::D, Key::MAJOR_PENTATONIC));}},
+      {"E major pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::E, Key::MAJOR_PENTATONIC));}},
+      {"F major pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::F, Key::MAJOR_PENTATONIC));}},
+      {"G major pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::G, Key::MAJOR_PENTATONIC));}},
+      {"A major pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::A, Key::MAJOR_PENTATONIC));}}
    }
    ,m_minor_pentatonic_buttons{
-      {"c minor pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::C, Key::MINOR_PENTATONIC));}},
-      {"d minor pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::D, Key::MINOR_PENTATONIC));}},
-      {"e minor pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::E, Key::MINOR_PENTATONIC));}},
-      {"f minor pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::F, Key::MINOR_PENTATONIC));}},
-      {"g minor pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::G, Key::MINOR_PENTATONIC));}},
-      {"a minor pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(BetterNote::A, Key::MINOR_PENTATONIC));}}
+      {"c minor pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::C, Key::MINOR_PENTATONIC));}},
+      {"d minor pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::D, Key::MINOR_PENTATONIC));}},
+      {"e minor pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::E, Key::MINOR_PENTATONIC));}},
+      {"f minor pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::F, Key::MINOR_PENTATONIC));}},
+      {"g minor pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::G, Key::MINOR_PENTATONIC));}},
+      {"a minor pentatonic", {250.f, 40.f}, [this](){m_pick_notes(getNotesForKey(Note::A, Key::MINOR_PENTATONIC));}}
    }
    ,m_all_button{"all", {100.f, 40.f}, [this](){m_pick_notes(getAllNotes());}}
 {

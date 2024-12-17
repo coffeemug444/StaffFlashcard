@@ -72,7 +72,7 @@ void Staff::clearNote()
    m_display_note = false;
 }
 
-void Staff::setNotes(const std::vector<BetterNote>& notes)
+void Staff::setNotes(const std::vector<Note>& notes)
 {
    m_selectable_notes = notes;
    setRandomNote();
@@ -119,7 +119,7 @@ void Staff::setRandomNote()
    std::uniform_int_distribution<> note_distr(0, m_selectable_notes.size() - 1);
    std::uniform_int_distribution<> octave_distr(0, 2);
 
-   static std::vector<NoteOctave> prev_notes (3,{BetterNote::A,-1});
+   static std::vector<NoteOctave> prev_notes (3,{Note::A,-1});
 
    auto numWasRecent = [](const NoteOctave& note)
    {
@@ -130,7 +130,7 @@ void Staff::setRandomNote()
    NoteModifier modifier{};
    while (true) 
    {
-      BetterNote note = m_selectable_notes.at(note_distr(gen));
+      Note note = m_selectable_notes.at(note_distr(gen));
       m_current_note = {note, octave_distr(gen)};
 
       if (mapNoteToStaffIndex(m_current_note) > 18) continue;  // off the staff

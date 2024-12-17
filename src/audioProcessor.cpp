@@ -6,7 +6,7 @@
 AudioProcessor::AudioProcessor(std::function<void(int)> on_tone_index_guessed)
    :m_on_tone_index_guessed{on_tone_index_guessed}
 {
-   setProcessingInterval(sf::milliseconds(200));
+   setProcessingInterval(sf::milliseconds(250));
 }
 
 bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t sample_count)
@@ -16,45 +16,29 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
 
    std::transform(samples, samples + sample_count, std::back_inserter(samples_double), [](sf::Int16 sample) { return static_cast<double>(sample); });
 
-   double total_power = 0;
-   for (auto sample : samples_double)
-   {
-      total_power += sample*sample;
-   }
-
-   total_power /= sample_count;
-
    double lowest_frequency = 55.0; // equivalent of A1
    std::vector<double> bins {};
 
-   for (int note = 0; note < 12*7; note++)
+   for (int note = 0; note < 12*5; note++)
    {
-      // 7 octaves of notes
-      bins.push_back(goertzelMag(samples_double, lowest_frequency*std::pow(2.0, note/12.0)));
-   }
+      double frequency = lowest_frequency*std::pow(2.0, note/12.0);
+      // 5 octaves of notes
+      double base        = goertzelMag(samples_double,           frequency);
+      double octave      = goertzelMag(samples_double,         2*frequency);
+      double two_octaves = goertzelMag(samples_double,         4*frequency);
+      double fifth       = goertzelMag(samples_double, (3.f/2.f)*frequency);
+      double fourth      = goertzelMag(samples_double, (4.f/3.f)*frequency);
 
-   std::vector<std::pair<int, double>> harmonics = {
-      {12      , 2.0/4},  // octave (12th fret harmonic)
-      {12+7    , 3.0/8},  // octave + perfect 5th (7th fret harmonic)
-      {2*12    , 2.0/8},  // 2 octaves (5th fret harmonic)
-      {2*12 + 4, 3.0/16}, // 2 octaves + major 3rd (9th fret harmonic)
-      {2*12 + 7, 3.0/16}  // 2 octaves + perfect 5th (idk but I'm sure it's present somehow)
-   };
+      double total = base + octave + fifth/5 + fourth/7;
 
-   for (int note = 0; note < bins.size(); note++)
-   {
-      for (auto [harmonic, strength] : harmonics)
-      {
-         if ((note + harmonic) < bins.size())
-         {
-            bins.at(note) += strength*bins.at(note + harmonic);
-         }
-      }
+      double adjustment = std::pow(3.0, note/(12.0*5.0)); // makes higher notes easier to detect
+
+      bins.push_back(total * adjustment);
    }
 
    auto best_note = std::max_element(bins.begin(), bins.end());
-
-   if (*best_note < 800) return true;
+   
+   if (*best_note < 400) return true;
 
    int tone_index = std::distance(bins.begin(), best_note) % 12;
 
