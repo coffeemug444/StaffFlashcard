@@ -87,7 +87,7 @@ void Main::pickAudioDevice(int idx)
 
 void Main::gotoNotesSetup()
 {
-   setWindowSize({760, 340});
+   setWindowSize({760, 400});
    m_stage = Stage::NOTES_SETUP;
 }
 

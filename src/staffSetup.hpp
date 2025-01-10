@@ -26,4 +26,13 @@ private:
 
    Button m_first_position_button;
 
+   sf::Text m_string_label;
+
+   Button m_E_string_button;
+   Button m_A_string_button;
+   Button m_D_string_button;
+   Button m_G_string_button;
+   Button m_B_string_button;
+   Button m_e_string_button;
+
 };

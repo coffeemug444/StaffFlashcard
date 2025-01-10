@@ -5,6 +5,7 @@
 #include <SFML/Graphics/Text.hpp>
 #include <algorithm>
 #include <ranges>
+#include "constants.hpp"
 
 constexpr std::array ALL_OCTAVES = std::to_array({0,1,2,3});
 
@@ -22,6 +23,8 @@ static std::vector<NoteOctave> firstPositionNotes()
    first_position_notes.insert(end(first_position_notes), begin(notes_above_e), end(notes_above_e));
    return first_position_notes;
 }
+
+
 
 
 StaffSetup::StaffSetup(std::function<void(const std::vector<NoteOctave>&)> pick_notes)
@@ -59,6 +62,13 @@ StaffSetup::StaffSetup(std::function<void(const std::vector<NoteOctave>&)> pick_
       {"a minor pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::A, Key::MINOR_PENTATONIC), ALL_OCTAVES))}
    }
    ,m_first_position_button{"First position", {180.f, 40.f}, std::bind(m_pick_notes, firstPositionNotes())}
+   ,m_string_label{"String: ", FONT}
+   ,m_E_string_button{"E", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForEString())}
+   ,m_A_string_button{"A", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForAString())}
+   ,m_D_string_button{"D", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForDString())}
+   ,m_G_string_button{"G", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForGString())}
+   ,m_B_string_button{"B", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForBString())}
+   ,m_e_string_button{"e", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForeString())}
 {
    for (auto [idx, button] : std::ranges::views::enumerate(m_major_buttons))
    {
@@ -78,6 +88,14 @@ StaffSetup::StaffSetup(std::function<void(const std::vector<NoteOctave>&)> pick_
    }
 
    m_first_position_button.move({0.f,m_major_buttons.size()*50.f});
+
+   m_string_label.move({0.f,m_major_buttons.size()*50.f + 50.f});
+   m_E_string_button.move({120.f + 0*50.f,m_major_buttons.size()*50 + 50.f});
+   m_A_string_button.move({120.f + 1*50.f,m_major_buttons.size()*50 + 50.f});
+   m_D_string_button.move({120.f + 2*50.f,m_major_buttons.size()*50 + 50.f});
+   m_G_string_button.move({120.f + 3*50.f,m_major_buttons.size()*50 + 50.f});
+   m_B_string_button.move({120.f + 4*50.f,m_major_buttons.size()*50 + 50.f});
+   m_e_string_button.move({120.f + 5*50.f,m_major_buttons.size()*50 + 50.f});
 }
 
 
@@ -90,6 +108,12 @@ void StaffSetup::mouseMoved(const sf::Vector2f& pos)
    std::ranges::for_each(m_major_pentatonic_buttons, fn);
    std::ranges::for_each(m_minor_pentatonic_buttons, fn);
    fn(m_first_position_button);
+   fn(m_E_string_button);
+   fn(m_A_string_button);
+   fn(m_D_string_button);
+   fn(m_G_string_button);
+   fn(m_B_string_button);
+   fn(m_e_string_button);
 }
 
 void StaffSetup::mouseDown(const sf::Vector2f& pos)
@@ -101,6 +125,12 @@ void StaffSetup::mouseDown(const sf::Vector2f& pos)
    std::ranges::for_each(m_major_pentatonic_buttons, fn);
    std::ranges::for_each(m_minor_pentatonic_buttons, fn);
    fn(m_first_position_button);
+   fn(m_E_string_button);
+   fn(m_A_string_button);
+   fn(m_D_string_button);
+   fn(m_G_string_button);
+   fn(m_B_string_button);
+   fn(m_e_string_button);
 }
 
 void StaffSetup::mouseUp(const sf::Vector2f& pos)
@@ -112,6 +142,12 @@ void StaffSetup::mouseUp(const sf::Vector2f& pos)
    std::ranges::for_each(m_major_pentatonic_buttons, fn);
    std::ranges::for_each(m_minor_pentatonic_buttons, fn);
    fn(m_first_position_button);
+   fn(m_E_string_button);
+   fn(m_A_string_button);
+   fn(m_D_string_button);
+   fn(m_G_string_button);
+   fn(m_B_string_button);
+   fn(m_e_string_button);
 }
 
 
@@ -136,4 +172,11 @@ void StaffSetup::draw(sf::RenderTarget& target, sf::RenderStates /*states*/) con
    }
 
    target.draw(m_first_position_button);
+   target.draw(m_string_label);
+   target.draw(m_E_string_button);
+   target.draw(m_A_string_button);
+   target.draw(m_D_string_button);
+   target.draw(m_G_string_button);
+   target.draw(m_B_string_button);
+   target.draw(m_e_string_button);
 }

@@ -102,6 +102,118 @@ std::vector<NoteOctave> notesInOctaves(std::span<const Note> notes, std::span<co
    return out;
 }
 
+std::vector<NoteOctave> noteOctavesForEString()
+{
+   using enum Note;
+   auto notes = notesInOctaves(getAllNotes(), std::to_array({0}));
+   auto highernotes = notesInOctaves(
+      std::to_array({
+         Eb, E, Es
+      }),
+      std::to_array({1}));
+   notes.insert(end(notes), begin(highernotes), end(highernotes));
+   return notes;
+}
+
+std::vector<NoteOctave> noteOctavesForAString()
+{
+   using enum Note;
+   auto notes = notesInOctaves(
+      std::to_array({
+         Ab, A, As,
+         Bb, B, Bs,
+         Cb, C, Cs,
+         Db, D, Ds
+      }),
+      std::to_array({0}));
+   auto highernotes = notesInOctaves(
+      std::to_array({
+         Eb, E, Es,
+         Fb, F, Fs,
+         Gb, G, Gs
+      }),
+      std::to_array({1}));
+   notes.insert(end(notes), begin(highernotes), end(highernotes));
+   return notes;
+}
+
+std::vector<NoteOctave> noteOctavesForDString()
+{
+   using enum Note;
+   auto notes = notesInOctaves(
+      std::to_array({
+         Db, D, Ds,
+      }),
+      std::to_array({0}));
+   auto highernotes = notesInOctaves(
+      std::to_array({
+         Eb, E, Es,
+         Gb, G, Gs,
+         Ab, A, As,
+         Bb, B, Bs,
+         Cb, C, Cs,
+         Db, D, Ds,
+      }),
+      std::to_array({1}));
+   notes.insert(end(notes), begin(highernotes), end(highernotes));
+   return notes;
+}
+
+std::vector<NoteOctave> noteOctavesForGString()
+{
+   using enum Note;
+   auto notes = notesInOctaves(
+      std::to_array({
+         Gb, G, Gs,
+         Ab, A, As,
+         Bb, B, Bs,
+         Cb, C, Cs,
+         Db, D, Ds,
+      }),
+      std::to_array({1}));
+   auto highernotes = notesInOctaves(
+      std::to_array({
+         Eb, E, Es,
+      }),
+      std::to_array({2}));
+   notes.insert(end(notes), begin(highernotes), end(highernotes));
+   return notes;
+}
+
+std::vector<NoteOctave> noteOctavesForBString()
+{
+   using enum Note;
+   auto notes = notesInOctaves(
+      std::to_array({
+         Bb, B, Bs,
+         Cb, C, Cs,
+         Db, D, Ds,
+      }),
+      std::to_array({1}));
+   auto highernotes = notesInOctaves(
+      std::to_array({
+         Eb, E, Es,
+         Gb, G, Gs,
+         Ab, A, As,
+      }),
+      std::to_array({2}));
+   notes.insert(end(notes), begin(highernotes), end(highernotes));
+   return notes;
+}
+
+std::vector<NoteOctave> noteOctavesForeString()
+{
+   using enum Note;
+   auto notes = notesInOctaves(getAllNotes(), std::to_array({2}));
+   auto highernotes = notesInOctaves(
+      std::to_array({
+         Eb, E, Es
+      }),
+      std::to_array({3}));
+   notes.insert(end(notes), begin(highernotes), end(highernotes));
+   return notes;
+}
+
 std::vector<Note> getAllNotes()
 {
    using enum Note;
