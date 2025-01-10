@@ -13,7 +13,6 @@
 #include <cmath>
 #include <complex>
 #include <functional>
-#include <ranges>
 
 using complex = std::complex<double>;
 
@@ -37,35 +36,57 @@ void Main::pollEvents() {
             m_staff.cheat();
          }
          break;
-      case sf::Event::TextEntered:
-      {
-         if (m_stage != Stage::AUDIO_SETUP) break;
-         if (event.text.unicode >= 128) break;
-         char c = event.text.unicode;
-         if (c < '0' or c > '9') break;
-         pickAudioDevice(c - '0');
-      }
       case sf::Event::MouseMoved:
       {
-         if (m_stage != Stage::NOTES_SETUP) break;
          sf::Vector2f pos = {static_cast<float>(event.mouseMove.x), static_cast<float>(event.mouseMove.y)};
-         m_staff_setup.mouseMoved(pos);
+         switch(m_stage)
+         {
+            using enum Stage;
+            case AUDIO_SETUP:
+               m_audio_setup.mouseMoved(pos);
+               break;
+            case NOTES_SETUP:
+               m_staff_setup.mouseMoved(pos);
+               break;
+            case RUNNING:
+               break;
+         }
          break;
       }
       case sf::Event::MouseButtonPressed:
       {
-         if (m_stage != Stage::NOTES_SETUP) break;
          if (event.mouseButton.button != sf::Mouse::Button::Left) break;
          sf::Vector2f pos = {static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)};
-         m_staff_setup.mouseDown(pos);
+         switch(m_stage)
+         {
+            using enum Stage;
+            case AUDIO_SETUP:
+               m_audio_setup.mouseDown(pos);
+               break;
+            case NOTES_SETUP:
+               m_staff_setup.mouseDown(pos);
+               break;
+            case RUNNING:
+               break;
+         }
          break;
       }
       case sf::Event::MouseButtonReleased:
       {
-         if (m_stage != Stage::NOTES_SETUP) break;
          if (event.mouseButton.button != sf::Mouse::Button::Left) break;
          sf::Vector2f pos = {static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)};
-         m_staff_setup.mouseUp(pos);
+         switch(m_stage)
+         {
+            using enum Stage;
+            case AUDIO_SETUP:
+               m_audio_setup.mouseUp(pos);
+               break;
+            case NOTES_SETUP:
+               m_staff_setup.mouseUp(pos);
+               break;
+            case RUNNING:
+               break;
+         }
          break;
       }
 
@@ -75,11 +96,9 @@ void Main::pollEvents() {
    }
 }
 
-
-void Main::pickAudioDevice(int idx)
+void Main::pickAudioDevice(const std::string& device_name)
 {
-   if (idx >= m_audio_devices.size()) return;
-   if (not m_audio_processor.setDevice(m_audio_devices.at(idx))) return;
+   if (not m_audio_processor.setDevice(device_name)) exit(-1);
    m_audio_processor.start();
 
    gotoNotesSetup();
@@ -112,26 +131,12 @@ Main::Main()
    ,m_audio_processor{std::bind(&Staff::guessNote, &m_staff, std::placeholders::_1)}
    ,m_stage{Stage::AUDIO_SETUP}
    ,m_font{[](){ sf::Font font; font.loadFromFile("font.ttf"); return font; }()}
-   ,m_audio_devices{AudioProcessor::getAvailableDevices()}
-   ,m_audio_devices_text(
-      [this](){
-         std::stringstream ss;
-         for (auto uh : std::ranges::views::enumerate(m_audio_devices) 
-                      | std::ranges::views::transform([](std::tuple<long, const std::string &>&& str_enumerated) {
-                           auto [idx, str] = str_enumerated; 
-                           return std::to_string(idx) + ". " + str + '\n';
-                      }))
-         {
-            ss << uh;
-         }
-         return ss.str();
-      }(), m_font)
+   ,m_audio_setup{
+      AudioProcessor::getAvailableDevices(), 
+      std::bind(&Main::pickAudioDevice, this, std::placeholders::_1),
+      std::bind(&Main::setWindowSize, this, std::placeholders::_1)}
 {
    m_window.setFramerateLimit(60);
-
-   auto text_bounds = m_audio_devices_text.getGlobalBounds();
-   text_bounds.width += 5;
-   setWindowSize(text_bounds.getSize());
 }
 
 void Main::loop()
@@ -144,7 +149,7 @@ void Main::loop()
       switch (m_stage)
       {
       case Stage::AUDIO_SETUP:
-         m_window.draw(m_audio_devices_text);
+         m_window.draw(m_audio_setup);
          break;
       case Stage::NOTES_SETUP:
          m_window.draw(m_staff_setup);

@@ -11,6 +11,16 @@ Button::Button(const std::string& text, const sf::Vector2f& size, std::function<
     m_background.setFillColor(STANDARD_COLOR);
 }
 
+
+Button::Button(const std::string& text, std::function<void()> on_click)
+    :m_text{text, FONT} // size??
+    ,m_background{{m_text.getGlobalBounds().getSize().x + 5.f, 40.f}}
+    ,m_on_click{on_click}
+    ,m_pressing{false}
+{
+    m_background.setFillColor(STANDARD_COLOR);
+}
+
 void Button::setPosition(const sf::Vector2f& pos)
 {
     sf::Vector2f current_pos = m_background.getPosition();
@@ -21,6 +31,11 @@ void Button::move(const sf::Vector2f& diff)
 {
     m_background.move(diff);
     m_text.move(diff);
+}
+
+sf::Vector2f Button::getSize() const
+{
+    return m_background.getSize();
 }
 
 void Button::mouseMoved(const sf::Vector2f& pos)

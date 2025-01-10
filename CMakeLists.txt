@@ -11,6 +11,7 @@ set (CMAKE_CXX_EXTENSIONS OFF)
 add_executable(StaffFlashcard 
     src/main.cpp 
     src/button.cpp 
+    src/audioSetup.cpp
     src/staff.cpp 
     src/staffSetup.cpp 
     src/types.cpp 

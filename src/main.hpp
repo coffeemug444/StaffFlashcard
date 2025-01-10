@@ -3,6 +3,7 @@
 #include "audioProcessor.hpp"
 #include "staff.hpp"
 #include "staffSetup.hpp"
+#include "audioSetup.hpp"
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -23,7 +24,7 @@ private:
    };
 
    void pollEvents();
-   void pickAudioDevice(int idx);
+   void pickAudioDevice(const std::string& device_name);
    void setWindowSize(const sf::Vector2f& size);
    
    void gotoNotesSetup();
@@ -36,6 +37,5 @@ private:
    Stage m_stage;
    
    sf::Font m_font;
-   std::vector<std::string> m_audio_devices;
-   sf::Text m_audio_devices_text;
+   AudioSetup m_audio_setup;
 };
