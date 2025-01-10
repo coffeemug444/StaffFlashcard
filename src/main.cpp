@@ -32,6 +32,10 @@ void Main::pollEvents() {
          {
             m_window.close();
          }
+         if (event.key.code == sf::Keyboard::Enter)
+         {
+            m_staff.cheat();
+         }
          break;
       case sf::Event::TextEntered:
       {
@@ -87,9 +91,9 @@ void Main::gotoNotesSetup()
    m_stage = Stage::NOTES_SETUP;
 }
 
-void Main::gotoRunning(const std::vector<Note>& notes)
+void Main::gotoRunning(const std::vector<NoteOctave>& notes)
 {
-   setWindowSize({270, 360});
+   setWindowSize({270, 460});
    m_staff.setNotes(notes);
    m_stage = Stage::RUNNING;
 }
@@ -110,14 +114,18 @@ Main::Main()
    ,m_font{[](){ sf::Font font; font.loadFromFile("font.ttf"); return font; }()}
    ,m_audio_devices{AudioProcessor::getAvailableDevices()}
    ,m_audio_devices_text(
-      std::ranges::views::join(
-         std::ranges::views::enumerate(m_audio_devices) 
-       | std::ranges::views::transform([](std::tuple<long, const std::string &>&& str_enumerated) {
-            auto [idx, str] = str_enumerated; 
-            return std::to_string(idx) + ". " + str + '\n';
-         })) 
-       | std::ranges::to<std::string>()
-      , m_font)
+      [this](){
+         std::stringstream ss;
+         for (auto uh : std::ranges::views::enumerate(m_audio_devices) 
+                      | std::ranges::views::transform([](std::tuple<long, const std::string &>&& str_enumerated) {
+                           auto [idx, str] = str_enumerated; 
+                           return std::to_string(idx) + ". " + str + '\n';
+                      }))
+         {
+            ss << uh;
+         }
+         return ss.str();
+      }(), m_font)
 {
    m_window.setFramerateLimit(60);
 

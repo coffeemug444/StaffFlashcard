@@ -14,11 +14,12 @@ public:
 
    void clearNote();
 
-   void setNotes(const std::vector<Note>& notes);
+   void setNotes(const std::vector<NoteOctave>& notes);
 
    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
    void guessNote(int tone_index);
+   void cheat();
 private:
    void drawCurrentNote();
 
@@ -34,7 +35,7 @@ private:
    constexpr static inline wchar_t STAFF_DOUBLE = L'\U0001D117';  // 𝄗
    constexpr static inline wchar_t STAFF_TRIPLE = L'\U0001D118';  // 𝄘
 
-   std::vector<Note> m_selectable_notes;
+   std::vector<NoteOctave> m_selectable_notes;
 
    NoteOctave m_current_note;
    sf::Vector2f m_position;
@@ -50,6 +51,7 @@ private:
    sf::Text m_lines;
    sf::Text m_extended_down_1_staff;
    sf::Text m_extended_down_2_staff;
+   sf::Text m_extended_down_3_staff;
    sf::Text m_extended_up_1_staff;
    sf::Text m_extended_up_2_staff;
    sf::Text m_extended_up_3_staff;
@@ -58,6 +60,7 @@ private:
 
    bool m_draw_extended_down_1_staff;
    bool m_draw_extended_down_2_staff;
+   bool m_draw_extended_down_3_staff;
    bool m_draw_extended_up_1_staff;
    bool m_draw_extended_up_2_staff;
    bool m_draw_extended_up_3_staff;

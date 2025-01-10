@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <utility>
 #include <ostream>
+#include <ranges>
 
 int mapNoteToStaffIndex(NoteOctave note_octave)
 {
@@ -13,33 +14,33 @@ int mapNoteToStaffIndex(NoteOctave note_octave)
    switch (note)
    {
       using enum Note;
-      case Ab:
-      case A:
-      case As:
-         return 0 + offset;
-      case Bb:
-      case B:
-      case Bs:
-         return 1 + offset;
-      case Cb:
-      case C:
-      case Cs:
-         return 2 + offset;
-      case Db:
-      case D:
-      case Ds:
-         return 3 + offset;
       case Eb:
       case E:
       case Es:
-         return 4 + offset;
+         return 0 + offset;
       case Fb:
       case F:
       case Fs:
-         return 5 + offset;
+         return 1 + offset;
       case Gb:
       case G:
       case Gs:
+         return 2 + offset;
+      case Ab:
+      case A:
+      case As:
+         return 3 + offset;
+      case Bb:
+      case B:
+      case Bs:
+         return 4 + offset;
+      case Cb:
+      case C:
+      case Cs:
+         return 5 + offset;
+      case Db:
+      case D:
+      case Ds:
          return 6 + offset;
    }
    std::unreachable();
@@ -88,6 +89,17 @@ NoteModifier getModifier(Note note)
    case 2: return NoteModifier::SHARP;
    }
    std::unreachable();
+}
+
+std::vector<NoteOctave> notesInOctaves(std::span<const Note> notes, std::span<const int> octaves)
+{
+   std::vector<NoteOctave> out;
+   for (auto [octave, note] : std::ranges::views::cartesian_product(octaves, notes))
+   {
+      out.push_back(NoteOctave{note, octave});
+   }
+
+   return out;
 }
 
 std::vector<Note> getAllNotes()

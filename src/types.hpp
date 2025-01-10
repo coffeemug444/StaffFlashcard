@@ -3,6 +3,7 @@
 #include <utility>
 #include <vector>
 #include <iosfwd>
+#include <span>
 
 enum class Note
 {
@@ -52,5 +53,7 @@ NoteModifier getModifier(Note note);
 
 std::vector<Note> getAllNotes();
 std::vector<Note> getNotesForKey(Note note, Key key);
+
+std::vector<NoteOctave> notesInOctaves(std::span<const Note> notes, std::span<const int> octaves);
 
 std::ostream & operator<<(std::ostream &out, Note note);

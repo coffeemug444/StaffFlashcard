@@ -27,7 +27,7 @@ private:
    void setWindowSize(const sf::Vector2f& size);
    
    void gotoNotesSetup();
-   void gotoRunning(const std::vector<Note>& notes);
+   void gotoRunning(const std::vector<NoteOctave>& notes);
 
    sf::RenderWindow m_window;
    Staff m_staff;
