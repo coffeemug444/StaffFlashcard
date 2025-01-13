@@ -54,6 +54,7 @@ NoteModifier getModifier(Note note);
 std::vector<Note> getAllNotes();
 std::vector<Note> getNotesForKey(Note note, Key key);
 
+std::vector<NoteOctave> noteOctavesForFirstPosition();
 std::vector<NoteOctave> noteOctavesForEString();
 std::vector<NoteOctave> noteOctavesForAString();
 std::vector<NoteOctave> noteOctavesForDString();

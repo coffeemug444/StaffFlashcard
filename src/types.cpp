@@ -102,6 +102,43 @@ std::vector<NoteOctave> notesInOctaves(std::span<const Note> notes, std::span<co
    return out;
 }
 
+std::vector<NoteOctave> noteOctavesForFirstPosition()
+{
+   using enum Note;
+   auto notes = notesInOctaves(
+      std::to_array({
+         E, Es,
+         Fb, F, Fs,
+         Gb, G, Gs,
+         Ab, A, As,
+         Bb, B, Bs,
+         Cb, C, Cs,
+         Db, D, Ds
+      }),
+      std::to_array({0}));
+   auto highernotes = notesInOctaves(
+      std::to_array({
+         Eb, E, Es,
+         Fb, F, Fs,
+         Gb, G, Gs,
+         Ab, A, As,
+         Bb, B, Bs,
+         Cb, C, Cs,
+         Db, D, Ds
+      }),
+      std::to_array({1}));
+   auto evenhighernotes = notesInOctaves(
+      std::to_array({
+         Eb, E, Es,
+         Fb, F, Fs,
+         Gb, G, Gs
+      }),
+      std::to_array({2}));
+   notes.insert(end(notes), begin(highernotes), end(highernotes));
+   notes.insert(end(notes), begin(evenhighernotes), end(evenhighernotes));
+   return notes;
+}
+
 std::vector<NoteOctave> noteOctavesForEString()
 {
    using enum Note;

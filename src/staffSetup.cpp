@@ -9,24 +9,6 @@
 
 constexpr std::array ALL_OCTAVES = std::to_array({0,1,2,3});
 
-static std::vector<NoteOctave> firstPositionNotes()
-{
-   auto first_position_notes = notesInOctaves(getAllNotes(), std::to_array({0,1}));
-
-   // there are a few more in octave 2
-   using enum Note;
-   auto notes_above_e = notesInOctaves(std::to_array({
-      Fb, F, Fs,
-      Gb, G, Gs
-   }), std::to_array({2}));
-
-   first_position_notes.insert(end(first_position_notes), begin(notes_above_e), end(notes_above_e));
-   return first_position_notes;
-}
-
-
-
-
 StaffSetup::StaffSetup(std::function<void(const std::vector<NoteOctave>&)> pick_notes)
    :m_pick_notes{pick_notes}
    ,m_major_buttons{
@@ -61,7 +43,7 @@ StaffSetup::StaffSetup(std::function<void(const std::vector<NoteOctave>&)> pick_
       {"g minor pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::G, Key::MINOR_PENTATONIC), ALL_OCTAVES))},
       {"a minor pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::A, Key::MINOR_PENTATONIC), ALL_OCTAVES))}
    }
-   ,m_first_position_button{"First position", {180.f, 40.f}, std::bind(m_pick_notes, firstPositionNotes())}
+   ,m_first_position_button{"First position", {180.f, 40.f}, std::bind(m_pick_notes, noteOctavesForFirstPosition())}
    ,m_string_label{"String: ", FONT}
    ,m_E_string_button{"E", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForEString())}
    ,m_A_string_button{"A", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForAString())}
