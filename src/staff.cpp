@@ -6,7 +6,7 @@
 #include <map>
 #include <random>
 
-
+const sf::Int32 TIMEOUT_MILLISECONDS = 500;
 
 
 Staff::Staff(float height)
@@ -32,6 +32,8 @@ Staff::Staff(float height)
    ,m_draw_extended_up_2_staff{false}
    ,m_draw_extended_up_3_staff{false}
    ,m_display_note{false}
+   ,m_clock{}
+   ,m_timeout{m_clock.getElapsedTime().asMilliseconds()}
 {
    m_font.loadFromFile("font.ttf");
    m_cleff.setPosition(height*.8,height*.35); // lol
@@ -119,6 +121,8 @@ void Staff::drawCurrentNote()
 
 void Staff::setRandomNote()
 {
+   m_timeout = m_clock.getElapsedTime().asMilliseconds() + TIMEOUT_MILLISECONDS;
+
    static std::random_device rd; // obtain a random number from hardware
    static std::mt19937 gen(rd()); // seed the generator
 
@@ -147,6 +151,8 @@ void Staff::setRandomNote()
 
 void Staff::guessNote(int tone_index)
 {
+   if (m_timeout > m_clock.getElapsedTime().asMilliseconds()) return;
+
    if (tone_index == mapNoteToToneIndex(m_current_note))
    {
       setRandomNote();

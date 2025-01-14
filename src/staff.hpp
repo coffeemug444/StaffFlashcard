@@ -2,7 +2,9 @@
 
 #include "types.hpp"
 
+#include <SFML/Config.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/System/Clock.hpp>
 
 class Staff : public sf::Drawable
 {
@@ -66,6 +68,9 @@ private:
    bool m_draw_extended_up_3_staff;
 
    bool m_display_note;
+
+   sf::Clock m_clock;
+   sf::Int32 m_timeout;
 
    static constexpr inline int NUM_LINES = 5;
 };
