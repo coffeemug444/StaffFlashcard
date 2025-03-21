@@ -8,8 +8,6 @@
 #include <algorithm>
 #include <cassert>
 
-#include <iostream>
-
 const int32_t TIMEOUT_MILLISECONDS = 500;
 
 
@@ -150,16 +148,12 @@ void Staff::setRandomNote()
    std::ranges::rotate(prev_notes, std::prev(end(prev_notes)));
    prev_notes.front() = m_current_note;
 
-   std::cout << "Set new note to " << m_current_note.first << ", tone index of " << mapNoteToToneIndex(m_current_note) << '\n';
-
    drawCurrentNote();
 }
 
 void Staff::guessNote(int tone_index)
 {
    if (m_timeout > m_clock.getElapsedTime().asMilliseconds()) return;
-
-   std::cout << "Guessed index is " << tone_index << '\n';
 
    if (tone_index == mapNoteToToneIndex(m_current_note))
    {
