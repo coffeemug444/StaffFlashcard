@@ -20,7 +20,8 @@ private:
 
    double goertzelMag(std::span<const double> samples, double frequency);
    static constexpr unsigned SAMPLE_RATE = 44100;
+   static constexpr unsigned PROCESSING_SIZE = SAMPLE_RATE / 4;
 
    std::function<void(int)> m_on_tone_index_guessed;
-   sf::SoundBuffer m_buffer;
+   std::vector<int16_t> m_buffer;
 };
