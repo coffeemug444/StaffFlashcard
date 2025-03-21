@@ -91,6 +91,38 @@ NoteModifier getModifier(Note note)
    std::unreachable();
 }
 
+bool notesAreEnharmonic(Note note1, Note note2)
+{
+   if (note1 == note2) return true;
+   switch (note1)
+   {
+   using enum Note;
+   case Ab: return note2 == Gs;
+   case A:  return false;
+   case As: return note2 == Bb;
+   case Bb: return note2 == As;
+   case B:  return note2 == Cb;
+   case Bs: return note2 == C;
+   case Cb: return note2 == B;
+   case C:  return note2 == Bs;
+   case Cs: return note2 == Db;
+   case Db: return note2 == Cs;
+   case D:  return false;
+   case Ds: return note2 == Eb;
+   case Eb: return note2 == Ds;
+   case E:  return note2 == Fb;
+   case Es: return note2 == F;
+   case Fb: return note2 == E;
+   case F:  return note2 == Es;
+   case Fs: return note2 == Gb;
+   case Gb: return note2 == Fs;
+   case G:  return false;
+   case Gs: return note2 == Ab;
+   }
+
+   return false;
+}
+
 std::vector<NoteOctave> notesInOctaves(std::span<const Note> notes, std::span<const int> octaves)
 {
    std::vector<NoteOctave> out;

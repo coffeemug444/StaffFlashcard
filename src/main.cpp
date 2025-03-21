@@ -9,7 +9,6 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
-#include <SFML/Window/WindowStyle.hpp>
 #include <cmath>
 #include <complex>
 #include <functional>
@@ -17,28 +16,42 @@
 using complex = std::complex<double>;
 
 
+template <typename B, typename A>
+sf::Vector2<B> convertVec(sf::Vector2<A> a)
+{
+   return sf::Vector2<B> {
+      static_cast<B>(a.x),
+      static_cast<B>(a.y),
+   };
+}
+
+
 void Main::pollEvents() {
-   sf::Event event;
-   while (m_window.pollEvent(event))
+   while (const std::optional<sf::Event> event = m_window.pollEvent())
    {
-      switch (event.type)
+      if (event->is<sf::Event::Closed>())
       {
-      case sf::Event::Closed:
          m_window.close();
-         break;
-      case sf::Event::KeyPressed:
-         if (event.key.code == sf::Keyboard::Escape)
-         {
-            m_window.close();
-         }
-         if (event.key.code == sf::Keyboard::Enter)
-         {
-            m_staff.cheat();
-         }
-         break;
-      case sf::Event::MouseMoved:
+      }
+      if (event->is<sf::Event::KeyPressed>())
       {
-         sf::Vector2f pos = {static_cast<float>(event.mouseMove.x), static_cast<float>(event.mouseMove.y)};
+         auto& event_key_pressed = *event->getIf<sf::Event::KeyPressed>();
+         switch (event_key_pressed.code)
+         {
+         case sf::Keyboard::Key::Escape:
+            m_window.close();
+            break;
+         case sf::Keyboard::Key::Enter:
+            m_staff.cheat();
+            break;
+         default: 
+            break;
+         }
+      }
+      if (event->is<sf::Event::MouseMoved>())
+      {
+         auto& event_mouse_moved = *event->getIf<sf::Event::MouseMoved>();
+         sf::Vector2f pos = convertVec<float>(event_mouse_moved.position);
          switch(m_stage)
          {
             using enum Stage;
@@ -53,10 +66,11 @@ void Main::pollEvents() {
          }
          break;
       }
-      case sf::Event::MouseButtonPressed:
+      if (event->is<sf::Event::MouseButtonPressed>())
       {
-         if (event.mouseButton.button != sf::Mouse::Button::Left) break;
-         sf::Vector2f pos = {static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)};
+         auto& event_mouse_pressed = *event->getIf<sf::Event::MouseButtonPressed>();
+         if (event_mouse_pressed.button != sf::Mouse::Button::Left) break;
+         sf::Vector2f pos = convertVec<float>(event_mouse_pressed.position);
          switch(m_stage)
          {
             using enum Stage;
@@ -71,10 +85,11 @@ void Main::pollEvents() {
          }
          break;
       }
-      case sf::Event::MouseButtonReleased:
+      if (event->is<sf::Event::MouseButtonReleased>())
       {
-         if (event.mouseButton.button != sf::Mouse::Button::Left) break;
-         sf::Vector2f pos = {static_cast<float>(event.mouseButton.x), static_cast<float>(event.mouseButton.y)};
+         auto& event_mouse_released = *event->getIf<sf::Event::MouseButtonReleased>();
+         if (event_mouse_released.button != sf::Mouse::Button::Left) break;
+         sf::Vector2f pos = convertVec<float>(event_mouse_released.position);
          switch(m_stage)
          {
             using enum Stage;
@@ -89,17 +104,13 @@ void Main::pollEvents() {
          }
          break;
       }
-
-      default:
-         break;
-      }
    }
 }
 
 void Main::pickAudioDevice(const std::string& device_name)
 {
    if (not m_audio_processor.setDevice(device_name)) exit(-1);
-   m_audio_processor.start();
+   assert(m_audio_processor.start());
 
    gotoNotesSetup();
 }
@@ -121,16 +132,17 @@ void Main::setWindowSize(const sf::Vector2f& size)
 {
    auto float_to_unsigned = [](const sf::Vector2f v) { return sf::Vector2u{ static_cast<unsigned>(v.x), static_cast<unsigned>(v.y) }; };
    m_window.setSize(float_to_unsigned(size));
-   m_window.setView(sf::View{sf::FloatRect{0.f, 0.f, size.x, size.y}});
+   m_window.setView(sf::View{sf::FloatRect{{0.f, 0.f}, size}});
 }
 
+
 Main::Main()
-   :m_window{sf::VideoMode(1, 1), "Staff flashcard", sf::Style::Default ^ sf::Style::Resize}
+   :m_window{sf::VideoMode({1, 1}), "Staff flashcard", sf::Style::Default ^ sf::Style::Resize}
    ,m_staff{200}
    ,m_staff_setup{std::bind(&Main::gotoRunning, this, std::placeholders::_1)}
    ,m_audio_processor{std::bind(&Staff::guessNote, &m_staff, std::placeholders::_1)}
    ,m_stage{Stage::AUDIO_SETUP}
-   ,m_font{[](){ sf::Font font; font.loadFromFile("font.ttf"); return font; }()}
+   ,m_font{[](){ sf::Font font; assert(font.openFromFile("font.ttf")); return font; }()}
    ,m_audio_setup{
       AudioProcessor::getAvailableDevices(), 
       std::bind(&Main::pickAudioDevice, this, std::placeholders::_1),
@@ -141,6 +153,7 @@ Main::Main()
 
 void Main::loop()
 {
+   m_window.setFramerateLimit(60);
    while (m_window.isOpen())
    {
       pollEvents();

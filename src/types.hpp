@@ -51,6 +51,8 @@ int mapNoteToToneIndex(NoteOctave note_octave);
 int mapNoteToStaffIndex(NoteOctave note_octave);
 NoteModifier getModifier(Note note);
 
+bool notesAreEnharmonic(Note note1, Note note2);
+
 std::vector<Note> getAllNotes();
 std::vector<Note> getNotesForKey(Note note, Key key);
 

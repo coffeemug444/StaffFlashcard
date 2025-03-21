@@ -44,7 +44,7 @@ StaffSetup::StaffSetup(std::function<void(const std::vector<NoteOctave>&)> pick_
       {"a minor pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::A, Key::MINOR_PENTATONIC), ALL_OCTAVES))}
    }
    ,m_first_position_button{"First position", {180.f, 40.f}, std::bind(m_pick_notes, noteOctavesForFirstPosition())}
-   ,m_string_label{"String: ", FONT}
+   ,m_string_label{FONT, "String: "}
    ,m_E_string_button{"E", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForEString())}
    ,m_A_string_button{"A", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForAString())}
    ,m_D_string_button{"D", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForDString())}

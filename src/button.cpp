@@ -3,7 +3,7 @@
 
 
 Button::Button(const std::string& text, const sf::Vector2f& size, std::function<void()> on_click)
-    :m_text{text, FONT} // size??
+    :m_text{FONT, text} // size??
     ,m_background{size}
     ,m_on_click{on_click}
     ,m_pressing{false}
@@ -13,8 +13,8 @@ Button::Button(const std::string& text, const sf::Vector2f& size, std::function<
 
 
 Button::Button(const std::string& text, std::function<void()> on_click)
-    :m_text{text, FONT} // size??
-    ,m_background{{m_text.getGlobalBounds().getSize().x + 5.f, 40.f}}
+    :m_text{FONT, text} // size??
+    ,m_background{sf::Vector2f{m_text.getGlobalBounds().size.x + 5.f, 40.f}}
     ,m_on_click{on_click}
     ,m_pressing{false}
 {

@@ -5,8 +5,10 @@
 #include <deque>
 #include <map>
 #include <random>
+#include <algorithm>
+#include <cassert>
 
-const sf::Int32 TIMEOUT_MILLISECONDS = 500;
+const int32_t TIMEOUT_MILLISECONDS = 500;
 
 
 Staff::Staff(float height)
@@ -15,16 +17,16 @@ Staff::Staff(float height)
    ,m_y1{height*0.05f}
    ,m_note_height{height*.167f}
    ,m_font{}
-   ,m_cleff{std::wstring{CLEF}, m_font, static_cast<unsigned>(height)}
-   ,m_lines{std::wstring(2, STAFF), m_font, static_cast<unsigned>(height)}
-   ,m_extended_down_1_staff{std::wstring{STAFF_SINGLE}, m_font, static_cast<unsigned>(height)}
-   ,m_extended_down_2_staff{std::wstring{STAFF_DOUBLE}, m_font, static_cast<unsigned>(height)}
-   ,m_extended_down_3_staff{std::wstring{STAFF_TRIPLE}, m_font, static_cast<unsigned>(height)}
-   ,m_extended_up_1_staff{std::wstring{STAFF_SINGLE}, m_font, static_cast<unsigned>(height)}
-   ,m_extended_up_2_staff{std::wstring{STAFF_DOUBLE}, m_font, static_cast<unsigned>(height)}
-   ,m_extended_up_3_staff{std::wstring{STAFF_TRIPLE}, m_font, static_cast<unsigned>(height)}
-   ,m_note{std::wstring{' '} + WHOLE_NOTE, m_font, static_cast<unsigned>(height)}
-   ,m_modifier{std::wstring{' '}, m_font, static_cast<unsigned>(height*.8)}
+   ,m_cleff{m_font, std::wstring{CLEF}, static_cast<unsigned>(height)}
+   ,m_lines{m_font, std::wstring(2, STAFF), static_cast<unsigned>(height)}
+   ,m_extended_down_1_staff{m_font, std::wstring{STAFF_SINGLE}, static_cast<unsigned>(height)}
+   ,m_extended_down_2_staff{m_font, std::wstring{STAFF_DOUBLE}, static_cast<unsigned>(height)}
+   ,m_extended_down_3_staff{m_font, std::wstring{STAFF_TRIPLE}, static_cast<unsigned>(height)}
+   ,m_extended_up_1_staff{m_font, std::wstring{STAFF_SINGLE}, static_cast<unsigned>(height)}
+   ,m_extended_up_2_staff{m_font, std::wstring{STAFF_DOUBLE}, static_cast<unsigned>(height)}
+   ,m_extended_up_3_staff{m_font, std::wstring{STAFF_TRIPLE}, static_cast<unsigned>(height)}
+   ,m_note{m_font, std::wstring{' '} + WHOLE_NOTE, static_cast<unsigned>(height)}
+   ,m_modifier{m_font, std::wstring{' '}, static_cast<unsigned>(height*.8)}
    ,m_draw_extended_down_1_staff{false}
    ,m_draw_extended_down_2_staff{false}
    ,m_draw_extended_down_3_staff{false}
@@ -35,22 +37,22 @@ Staff::Staff(float height)
    ,m_clock{}
    ,m_timeout{m_clock.getElapsedTime().asMilliseconds()}
 {
-   m_font.loadFromFile("font.ttf");
-   m_cleff.setPosition(height*.8,height*.35); // lol
+   assert(m_font.openFromFile("font.ttf"));
+   m_cleff.setPosition({height*.8f,height*.35f}); // lol
 
-   m_lines.setPosition(0,height*.35); // lol
-   m_extended_down_1_staff.setPosition(height*.5,height*1.185); // lol
+   m_lines.setPosition({0.f,height*.35f}); // lol
+   m_extended_down_1_staff.setPosition({height*.5f,height*1.185f}); // lol
    m_extended_down_1_staff.setScale({0.8, 1.0});
-   m_extended_down_2_staff.setPosition(height*.5,height*1.185); // lol
+   m_extended_down_2_staff.setPosition({height*.5f,height*1.185f}); // lol
    m_extended_down_2_staff.setScale({0.8, 1.0});
-   m_extended_down_3_staff.setPosition(height*.5,height*1.185); // lol
+   m_extended_down_3_staff.setPosition({height*.5f,height*1.185f}); // lol
    m_extended_down_3_staff.setScale({0.8, 1.0});
    
-   m_extended_up_1_staff.setPosition(height*.5, height*0.170);
+   m_extended_up_1_staff.setPosition({height*.5f, height*0.170f});
    m_extended_up_1_staff.setScale({0.8, 1.0});
-   m_extended_up_2_staff.setPosition(height*.5, height*0.005);
+   m_extended_up_2_staff.setPosition({height*.5f, height*0.005f});
    m_extended_up_2_staff.setScale({0.8, 1.0});
-   m_extended_up_3_staff.setPosition(height*.5, -height*0.160);
+   m_extended_up_3_staff.setPosition({height*.5f, -height*0.160f});
    m_extended_up_3_staff.setScale({0.8, 1.0});
 }
 
@@ -95,11 +97,11 @@ void Staff::drawCurrentNote()
    {
    case NoteModifier::FLAT:
       m_modifier.setString(std::wstring{FLAT});
-      m_modifier.setPosition(x + m_height*0.15,y + m_height*0.25);
+      m_modifier.setPosition({x + m_height*0.15f,y + m_height*0.25f});
       break;
    case NoteModifier::SHARP:
       m_modifier.setString(std::wstring{SHARP});
-      m_modifier.setPosition(x + m_height*0.15,y + m_height*0.32);
+      m_modifier.setPosition({x + m_height*0.15f,y + m_height*0.32f});
       break;
    case NoteModifier::NATURAL:
       m_modifier.setString("");
@@ -108,7 +110,7 @@ void Staff::drawCurrentNote()
 
    m_display_note = true;
 
-   m_note.setPosition(x,y);
+   m_note.setPosition({x,y});
 
    m_draw_extended_down_3_staff = position <= 1;
    m_draw_extended_down_2_staff =  not m_draw_extended_down_3_staff and position <= 3;
@@ -138,7 +140,7 @@ void Staff::setRandomNote()
 
       if (mapNoteToStaffIndex(m_current_note) > 21) continue;  // off the staff
       if (std::ranges::contains(prev_notes, m_current_note)) continue;  // too recent
-      if (mapNoteToToneIndex(m_current_note) == mapNoteToToneIndex(last_note)) continue;  // equivalent note
+      if (notesAreEnharmonic(m_current_note.first, last_note.first)) continue;
 
       break;
    }

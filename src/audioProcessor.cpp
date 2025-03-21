@@ -6,15 +6,14 @@
 AudioProcessor::AudioProcessor(std::function<void(int)> on_tone_index_guessed)
    :m_on_tone_index_guessed{on_tone_index_guessed}
 {
-   setProcessingInterval(sf::milliseconds(250));
 }
 
-bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t sample_count)
+bool AudioProcessor::onProcessSamples(const int16_t* samples, std::size_t sample_count)
 {
    std::vector<double> samples_double;
    samples_double.reserve(sample_count);
 
-   std::transform(samples, samples + sample_count, std::back_inserter(samples_double), [](sf::Int16 sample) { return static_cast<double>(sample); });
+   std::transform(samples, samples + sample_count, std::back_inserter(samples_double), [](int16_t sample) { return static_cast<double>(sample); });
 
    double lowest_frequency = 55.0; // equivalent of A1
    std::vector<double> bins {};
@@ -38,7 +37,7 @@ bool AudioProcessor::onProcessSamples(const sf::Int16* samples, std::size_t samp
 
    auto best_note = std::max_element(bins.begin(), bins.end());
    
-   if (*best_note < 400) return true;
+   if (*best_note < 200) return true;
 
    int tone_index = std::distance(bins.begin(), best_note) % 12;
 

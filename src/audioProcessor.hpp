@@ -13,7 +13,7 @@ class AudioProcessor : public sf::SoundRecorder
 {
 public:
    AudioProcessor(std::function<void(int)> on_tone_index_guessed);
-   bool onProcessSamples(const sf::Int16* samples, std::size_t sampleCount) override;
+   bool onProcessSamples(const int16_t* samples, std::size_t sampleCount) override;
 
    ~AudioProcessor() { stop(); }
 private:

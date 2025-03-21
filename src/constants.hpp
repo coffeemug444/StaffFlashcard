@@ -1,9 +1,9 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <cassert>
 
-
-const inline sf::Font FONT = [](){ sf::Font font; font.loadFromFile("font.ttf"); return font; }();
+const inline sf::Font FONT = [](){ sf::Font font; assert(font.openFromFile("font.ttf")); return font; }();
 
 constexpr inline wchar_t FLAT = L'\U0000266D';          // ♭
 constexpr inline wchar_t SHARP = L'\U0000266F';         // ♯

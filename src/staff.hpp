@@ -70,7 +70,7 @@ private:
    bool m_display_note;
 
    sf::Clock m_clock;
-   sf::Int32 m_timeout;
+   int32_t m_timeout;
 
    static constexpr inline int NUM_LINES = 5;
 };
