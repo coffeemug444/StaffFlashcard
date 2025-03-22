@@ -10,18 +10,20 @@
 class StaffSetup : public sf::Drawable
 {
 public:
-   StaffSetup(std::function<void(const std::vector<NoteOctave>&)> pick_notes);
+   StaffSetup(std::function<void(const std::vector<NoteSet>&)> pick_notes);
 
    void mouseMoved(const sf::Vector2f& pos);
    void mouseDown(const sf::Vector2f& pos);
    void mouseUp(const sf::Vector2f& pos);
 
-   std::vector<NoteOctave> filterNotes(const std::vector<NoteOctave>&);
-
+   
    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-
+   
 private:
-   std::function<void(const std::vector<NoteOctave>&)> m_pick_notes;
+   std::vector<NoteOctave> filterNotes(const std::vector<NoteOctave>&);
+   void useSelectedStrings();
+
+   std::function<void(const std::vector<NoteSet>&)> m_pick_notes;
 
    std::vector<Button> m_major_buttons;
    std::vector<Button> m_minor_buttons;
@@ -38,6 +40,8 @@ private:
    ToggleButton m_G_string_button;
    ToggleButton m_B_string_button;
    ToggleButton m_e_string_button;
+
+   Button m_go_button;
 
    Checkbox m_sharps_checkbox;
    Checkbox m_flats_checkbox;

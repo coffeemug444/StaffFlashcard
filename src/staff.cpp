@@ -12,7 +12,7 @@ const int32_t TIMEOUT_MILLISECONDS = 500;
 
 
 Staff::Staff(float height)
-   :m_selectable_notes{}
+   :m_note_sets{}
    ,m_height{height}
    ,m_y1{height*0.05f}
    ,m_note_height{height*.167f}
@@ -80,9 +80,9 @@ void Staff::clearNote()
    m_display_note = false;
 }
 
-void Staff::setNotes(const std::vector<NoteOctave>& notes)
+void Staff::setNotes(const std::vector<NoteSet>& note_sets)
 {
-   m_selectable_notes = notes;
+   m_note_sets = note_sets;
    setRandomNote();
 }
 
@@ -128,14 +128,20 @@ void Staff::setRandomNote()
    static std::random_device rd; // obtain a random number from hardware
    static std::mt19937 gen(rd()); // seed the generator
 
-   std::uniform_int_distribution<> note_distr(0, m_selectable_notes.size() - 1);
+
+   std::uniform_int_distribution<> note_set_distr(0, m_note_sets.size() - 1);
+
 
    static std::vector<NoteOctave> prev_notes (3,{Note::A,-1});
 
    NoteOctave last_note = m_current_note;
    while (true) 
    {
-      m_current_note = m_selectable_notes.at(note_distr(gen));
+      const auto& note_set = m_note_sets.at(note_set_distr(gen));
+
+      std::uniform_int_distribution<> note_distr(0, note_set.first.size() - 1);
+
+      m_current_note = note_set.first.at(note_distr(gen));
 
       if (mapNoteToStaffIndex(m_current_note) > 21) continue;  // off the staff
       if (std::ranges::contains(prev_notes, m_current_note)) continue;  // too recent

@@ -16,7 +16,7 @@ public:
 
    void clearNote();
 
-   void setNotes(const std::vector<NoteOctave>& notes);
+   void setNotes(const std::vector<NoteSet>& note_sets);
 
    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
@@ -37,7 +37,7 @@ private:
    constexpr static inline wchar_t STAFF_DOUBLE = L'\U0001D117';  // 𝄗
    constexpr static inline wchar_t STAFF_TRIPLE = L'\U0001D118';  // 𝄘
 
-   std::vector<NoteOctave> m_selectable_notes;
+   std::vector<NoteSet> m_note_sets;
 
    NoteOctave m_current_note;
    sf::Vector2f m_position;

@@ -147,7 +147,7 @@ void Main::gotoNotesSetup()
    m_stage = Stage::NOTES_SETUP;
 }
 
-void Main::gotoRunning(const std::vector<NoteOctave>& notes)
+void Main::gotoRunning(const std::vector<NoteSet>& notes)
 {
    setWindowSize({270, 460});
    m_staff.setNotes(notes);

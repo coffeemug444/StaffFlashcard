@@ -46,6 +46,7 @@ enum class NoteModifier
 };
 
 using NoteOctave = std::pair<Note, int>;
+using NoteSet = std::pair<std::vector<NoteOctave>, std::string>;
 
 int mapNoteToToneIndex(NoteOctave note_octave);
 int mapNoteToStaffIndex(NoteOctave note_octave);

@@ -29,7 +29,7 @@ private:
    
    void gotoAudioSetup();
    void gotoNotesSetup();
-   void gotoRunning(const std::vector<NoteOctave>& notes);
+   void gotoRunning(const std::vector<NoteSet>& notes);
 
    sf::RenderWindow m_window;
    Staff m_staff;
