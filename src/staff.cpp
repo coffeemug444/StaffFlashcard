@@ -133,7 +133,6 @@ void Staff::setRandomNote()
    static std::vector<NoteOctave> prev_notes (3,{Note::A,-1});
 
    NoteOctave last_note = m_current_note;
-   NoteModifier modifier{};
    while (true) 
    {
       m_current_note = m_selectable_notes.at(note_distr(gen));

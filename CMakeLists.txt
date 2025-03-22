@@ -19,6 +19,8 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
+add_compile_options(-Wall -Wextra -Wpedantic -pg)
+
 add_executable(StaffFlashcard 
     src/main.cpp 
     src/button.cpp 
@@ -32,4 +34,4 @@ target_link_libraries(StaffFlashcard PRIVATE SFML::Graphics SFML::Window SFML::S
 
 target_include_directories(StaffFlashcard PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
-configure_file("${CMAKE_SOURCE_DIR}/resource/font.ttf" "${CMAKE_BINARY_DIR}/font.ttf" COPYONLY)
+configure_file("${CMAKE_SOURCE_DIR}/resource/font.ttf" "${CMAKE_BINARY_DIR}/bin/font.ttf" COPYONLY)

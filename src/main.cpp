@@ -148,12 +148,11 @@ Main::Main()
       std::bind(&Main::pickAudioDevice, this, std::placeholders::_1),
       std::bind(&Main::setWindowSize, this, std::placeholders::_1)}
 {
-   m_window.setFramerateLimit(60);
+   m_window.setFramerateLimit(144);
 }
 
 void Main::loop()
 {
-   m_window.setFramerateLimit(60);
    while (m_window.isOpen())
    {
       pollEvents();

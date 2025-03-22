@@ -33,7 +33,6 @@ bool AudioProcessor::onProcessSamples(const int16_t* samples, std::size_t sample
       // 5 octaves of notes
       double base        = goertzelMag(samples_double,           frequency);
       double octave      = goertzelMag(samples_double,         2*frequency);
-      double two_octaves = goertzelMag(samples_double,         4*frequency);
       double fifth       = goertzelMag(samples_double, (3.f/2.f)*frequency);
       double fourth      = goertzelMag(samples_double, (4.f/3.f)*frequency);
 
