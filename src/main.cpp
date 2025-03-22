@@ -56,10 +56,12 @@ void Main::pollEvents()
                if (m_stage == Stage::RUNNING)
                {
                   gotoNotesSetup();
+                  break;
                }
                if (m_stage == Stage::NOTES_SETUP)
                {
                   gotoAudioSetup();
+                  break;
                }
             default: 
                break;
