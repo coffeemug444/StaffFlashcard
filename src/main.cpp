@@ -9,6 +9,7 @@
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <cmath>
 #include <complex>
 #include <functional>
@@ -44,6 +45,11 @@ void Main::pollEvents() {
          case sf::Keyboard::Key::Enter:
             m_staff.cheat();
             break;
+         case sf::Keyboard::Key::Backspace:
+            if (m_stage == Stage::RUNNING)
+            {
+               gotoNotesSetup();
+            }
          default: 
             break;
          }
