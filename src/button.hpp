@@ -27,7 +27,7 @@ private:
     std::function<void()> m_on_click;
 
     const static inline sf::Color STANDARD_COLOR = sf::Color::Blue;
-    const static inline sf::Color HOVER_COLOR = sf::Color::Red;
+    const static inline sf::Color HOVER_COLOR = sf::Color(100, 100, 255);
     const static inline sf::Color PRESS_COLOR = sf::Color::Magenta;
 
     bool m_pressing;

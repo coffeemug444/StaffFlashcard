@@ -5,6 +5,7 @@
 #include <SFML/Graphics/Text.hpp>
 #include <algorithm>
 #include <ranges>
+#include <algorithm>
 #include "constants.hpp"
 
 constexpr std::array ALL_OCTAVES = std::to_array({0,1,2,3});
@@ -45,12 +46,14 @@ StaffSetup::StaffSetup(std::function<void(const std::vector<NoteOctave>&)> pick_
    }
    ,m_first_position_button{"First position", {180.f, 40.f}, std::bind(m_pick_notes, noteOctavesForFirstPosition())}
    ,m_string_label{FONT, "String: "}
-   ,m_E_string_button{"E", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForEString())}
-   ,m_A_string_button{"A", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForAString())}
-   ,m_D_string_button{"D", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForDString())}
-   ,m_G_string_button{"G", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForGString())}
-   ,m_B_string_button{"B", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForBString())}
-   ,m_e_string_button{"e", {40.f, 40.f}, std::bind(m_pick_notes, noteOctavesForeString())}
+   ,m_E_string_button{"E", {40.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForEString())); }}
+   ,m_A_string_button{"A", {40.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForAString())); }}
+   ,m_D_string_button{"D", {40.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForDString())); }}
+   ,m_G_string_button{"G", {40.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForGString())); }}
+   ,m_B_string_button{"B", {40.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForBString())); }}
+   ,m_e_string_button{"e", {40.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForeString())); }}
+   ,m_sharps_checkbox{"Sharps"}
+   ,m_flats_checkbox{"Flats"}
 {
    for (auto [idx, button] : std::ranges::views::enumerate(m_major_buttons))
    {
@@ -78,8 +81,29 @@ StaffSetup::StaffSetup(std::function<void(const std::vector<NoteOctave>&)> pick_
    m_G_string_button.move({120.f + 3*50.f,m_major_buttons.size()*50 + 50.f});
    m_B_string_button.move({120.f + 4*50.f,m_major_buttons.size()*50 + 50.f});
    m_e_string_button.move({120.f + 5*50.f,m_major_buttons.size()*50 + 50.f});
+
+   m_sharps_checkbox.move({450.f,m_major_buttons.size()*50.f});
+   m_flats_checkbox.move({450.f,(m_major_buttons.size()+1)*50.f});
 }
 
+std::vector<NoteOctave> StaffSetup::filterNotes(const std::vector<NoteOctave>& notes)
+{
+   return notes 
+      | std::ranges::views::filter([this](NoteOctave note) 
+      { 
+         switch (getModifier(note.first))
+         {
+         case NoteModifier::FLAT:
+            return m_flats_checkbox.checked();
+         case NoteModifier::NATURAL:
+            return true;
+         case NoteModifier::SHARP:
+            return m_sharps_checkbox.checked();
+         }
+         return false;
+      })
+      | std::ranges::to<std::vector>();
+}
 
 void StaffSetup::mouseMoved(const sf::Vector2f& pos)
 {
@@ -96,6 +120,9 @@ void StaffSetup::mouseMoved(const sf::Vector2f& pos)
    fn(m_G_string_button);
    fn(m_B_string_button);
    fn(m_e_string_button);
+
+   m_sharps_checkbox.mouseMoved(pos);
+   m_flats_checkbox.mouseMoved(pos);
 }
 
 void StaffSetup::mouseDown(const sf::Vector2f& pos)
@@ -113,6 +140,9 @@ void StaffSetup::mouseDown(const sf::Vector2f& pos)
    fn(m_G_string_button);
    fn(m_B_string_button);
    fn(m_e_string_button);
+
+   m_sharps_checkbox.mouseDown(pos);
+   m_flats_checkbox.mouseDown(pos);
 }
 
 void StaffSetup::mouseUp(const sf::Vector2f& pos)
@@ -130,6 +160,9 @@ void StaffSetup::mouseUp(const sf::Vector2f& pos)
    fn(m_G_string_button);
    fn(m_B_string_button);
    fn(m_e_string_button);
+
+   m_sharps_checkbox.mouseUp(pos);
+   m_flats_checkbox.mouseUp(pos);
 }
 
 
@@ -161,4 +194,7 @@ void StaffSetup::draw(sf::RenderTarget& target, sf::RenderStates /*states*/) con
    target.draw(m_G_string_button);
    target.draw(m_B_string_button);
    target.draw(m_e_string_button);
+
+   target.draw(m_sharps_checkbox);
+   target.draw(m_flats_checkbox);
 }
