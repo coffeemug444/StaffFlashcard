@@ -9,6 +9,7 @@ Button::Button(const std::string& text, const sf::Vector2f& size, std::function<
     ,m_pressing{false}
 {
     m_background.setFillColor(STANDARD_COLOR);
+    m_text.move({(size.x - m_text.getGlobalBounds().size.x)/2.f, 0.f});
 }
 
 
