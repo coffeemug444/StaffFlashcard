@@ -16,6 +16,11 @@
 
 using complex = std::complex<double>;
 
+template<typename ... Callable>
+struct visitor : Callable... {
+   using Callable::operator()...;
+};
+
 
 template <typename B, typename A>
 sf::Vector2<B> convertVec(sf::Vector2<A> a)
@@ -27,89 +32,86 @@ sf::Vector2<B> convertVec(sf::Vector2<A> a)
 }
 
 
-void Main::pollEvents() {
+void Main::pollEvents() 
+{
    while (const std::optional<sf::Event> event = m_window.pollEvent())
    {
-      if (event->is<sf::Event::Closed>())
-      {
-         m_window.close();
-      }
-      if (event->is<sf::Event::KeyPressed>())
-      {
-         auto& event_key_pressed = *event->getIf<sf::Event::KeyPressed>();
-         switch (event_key_pressed.code)
+      event->visit(visitor{
+         [&](sf::Event::Closed)
          {
-         case sf::Keyboard::Key::Escape:
             m_window.close();
-            break;
-         case sf::Keyboard::Key::Enter:
-            m_staff.cheat();
-            break;
-         case sf::Keyboard::Key::Backspace:
-            if (m_stage == Stage::RUNNING)
+         },
+         [&](sf::Event::KeyPressed ev)
+         {
+            switch (ev.code)
             {
-               gotoNotesSetup();
+            case sf::Keyboard::Key::Escape:
+               m_window.close();
+               break;
+            case sf::Keyboard::Key::Enter:
+               m_staff.cheat();
+               break;
+            case sf::Keyboard::Key::Backspace:
+               if (m_stage == Stage::RUNNING)
+               {
+                  gotoNotesSetup();
+               }
+            default: 
+               break;
             }
-         default: 
-            break;
-         }
-      }
-      if (event->is<sf::Event::MouseMoved>())
-      {
-         auto& event_mouse_moved = *event->getIf<sf::Event::MouseMoved>();
-         sf::Vector2f pos = convertVec<float>(event_mouse_moved.position);
-         switch(m_stage)
+         },
+         [&](sf::Event::MouseMoved ev)
          {
-            using enum Stage;
-            case AUDIO_SETUP:
-               m_audio_setup.mouseMoved(pos);
-               break;
-            case NOTES_SETUP:
-               m_staff_setup.mouseMoved(pos);
-               break;
-            case RUNNING:
-               break;
-         }
-         break;
-      }
-      if (event->is<sf::Event::MouseButtonPressed>())
-      {
-         auto& event_mouse_pressed = *event->getIf<sf::Event::MouseButtonPressed>();
-         if (event_mouse_pressed.button != sf::Mouse::Button::Left) break;
-         sf::Vector2f pos = convertVec<float>(event_mouse_pressed.position);
-         switch(m_stage)
+            sf::Vector2f pos = convertVec<float>(ev.position);
+            switch(m_stage)
+            {
+               using enum Stage;
+               case AUDIO_SETUP:
+                  m_audio_setup.mouseMoved(pos);
+                  break;
+               case NOTES_SETUP:
+                  m_staff_setup.mouseMoved(pos);
+                  break;
+               case RUNNING:
+                  break;
+            }
+         },
+         [&](sf::Event::MouseButtonPressed ev)
          {
-            using enum Stage;
-            case AUDIO_SETUP:
-               m_audio_setup.mouseDown(pos);
-               break;
-            case NOTES_SETUP:
-               m_staff_setup.mouseDown(pos);
-               break;
-            case RUNNING:
-               break;
-         }
-         break;
-      }
-      if (event->is<sf::Event::MouseButtonReleased>())
-      {
-         auto& event_mouse_released = *event->getIf<sf::Event::MouseButtonReleased>();
-         if (event_mouse_released.button != sf::Mouse::Button::Left) break;
-         sf::Vector2f pos = convertVec<float>(event_mouse_released.position);
-         switch(m_stage)
+            if (ev.button != sf::Mouse::Button::Left) return;
+            sf::Vector2f pos = convertVec<float>(ev.position);
+            switch(m_stage)
+            {
+               using enum Stage;
+               case AUDIO_SETUP:
+                  m_audio_setup.mouseDown(pos);
+                  break;
+               case NOTES_SETUP:
+                  m_staff_setup.mouseDown(pos);
+                  break;
+               case RUNNING:
+                  break;
+            }
+         },
+         [&](sf::Event::MouseButtonReleased ev)
          {
-            using enum Stage;
-            case AUDIO_SETUP:
-               m_audio_setup.mouseUp(pos);
-               break;
-            case NOTES_SETUP:
-               m_staff_setup.mouseUp(pos);
-               break;
-            case RUNNING:
-               break;
-         }
-         break;
-      }
+            if (ev.button != sf::Mouse::Button::Left) return;
+            sf::Vector2f pos = convertVec<float>(ev.position);
+            switch(m_stage)
+            {
+               using enum Stage;
+               case AUDIO_SETUP:
+                  m_audio_setup.mouseUp(pos);
+                  break;
+               case NOTES_SETUP:
+                  m_staff_setup.mouseUp(pos);
+                  break;
+               case RUNNING:
+                  break;
+            }
+         },
+         [](auto){} // default
+      });
    }
 }
 
