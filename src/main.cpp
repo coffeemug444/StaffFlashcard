@@ -13,6 +13,7 @@
 #include <cmath>
 #include <complex>
 #include <functional>
+#include <fstream>
 
 using complex = std::complex<double>;
 
@@ -23,7 +24,7 @@ struct visitor : Callable... {
 
 
 template <typename B, typename A>
-sf::Vector2<B> convertVec(sf::Vector2<A> a)
+static sf::Vector2<B> convertVec(sf::Vector2<A> a)
 {
    return sf::Vector2<B> {
       static_cast<B>(a.x),
@@ -55,6 +56,10 @@ void Main::pollEvents()
                if (m_stage == Stage::RUNNING)
                {
                   gotoNotesSetup();
+               }
+               if (m_stage == Stage::NOTES_SETUP)
+               {
+                  // gotoAudioSetup();
                }
             default: 
                break;
@@ -117,10 +122,21 @@ void Main::pollEvents()
 
 void Main::pickAudioDevice(const std::string& device_name)
 {
-   if (not m_audio_processor.setDevice(device_name)) exit(-1);
+   assert(m_audio_processor.setDevice(device_name));
    assert(m_audio_processor.start());
 
+   std::ofstream file("saved_device.dat");
+   assert(file);
+   file << device_name;
+
    gotoNotesSetup();
+}
+
+void Main::gotoAudioSetup()
+{
+   m_stage = Stage::AUDIO_SETUP;
+
+   // and the rest as well
 }
 
 void Main::gotoNotesSetup()

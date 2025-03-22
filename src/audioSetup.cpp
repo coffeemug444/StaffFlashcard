@@ -1,9 +1,11 @@
 #include "audioSetup.hpp"
 
 #include <ranges>
+#include <fstream>
+#include <algorithm>
 
 
-std::vector<Button> getButtons(const std::vector<std::string>& devices, std::function<void(const std::string&)> pick_audio_device)
+static std::vector<Button> getButtons(const std::vector<std::string>& devices, std::function<void(const std::string&)> pick_audio_device)
 {  
    std::vector<Button> buttons;
    for (const std::string& device : devices)
@@ -29,6 +31,18 @@ AudioSetup::AudioSetup(
    }
 
    resize_callback({longest + 10.f,50.f*m_buttons.size() - 10.f});
+
+   std::string line;
+   {
+      std::ifstream file("saved_device.dat");
+      assert(file);
+      std::getline(file, line);
+   }
+
+   if (std::ranges::contains(devices, line))
+   {
+      pick_audio_device(line);
+   }
 }
 
 void AudioSetup::mouseMoved(const sf::Vector2f& pos)

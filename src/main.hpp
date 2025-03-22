@@ -27,6 +27,7 @@ private:
    void pickAudioDevice(const std::string& device_name);
    void setWindowSize(const sf::Vector2f& size);
    
+   void gotoAudioSetup();
    void gotoNotesSetup();
    void gotoRunning(const std::vector<NoteOctave>& notes);
 

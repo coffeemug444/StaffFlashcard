@@ -36,3 +36,4 @@ target_link_libraries(StaffFlashcard PRIVATE SFML::Graphics SFML::Window SFML::S
 target_include_directories(StaffFlashcard PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
 configure_file("${CMAKE_SOURCE_DIR}/resource/font.ttf" "${CMAKE_BINARY_DIR}/bin/font.ttf" COPYONLY)
+configure_file("${CMAKE_SOURCE_DIR}/resource/saved_device.dat" "${CMAKE_BINARY_DIR}/bin/saved_device.dat" COPYONLY)
