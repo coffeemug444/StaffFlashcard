@@ -1,4 +1,5 @@
 #include "staffSetup.hpp"
+#include "pressable.hpp"
 #include "types.hpp"
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
@@ -46,12 +47,12 @@ StaffSetup::StaffSetup(std::function<void(const std::vector<NoteOctave>&)> pick_
    }
    ,m_first_position_button{"First position", [this](){ m_pick_notes(filterNotes(noteOctavesForFirstPosition())); }, {180.f, 40.f}}
    ,m_string_label{FONT, "String: "}
-   ,m_E_string_button{"E", [this](){ m_pick_notes(filterNotes(noteOctavesForEString())); }, {40.f, 40.f}}
-   ,m_A_string_button{"A", [this](){ m_pick_notes(filterNotes(noteOctavesForAString())); }, {40.f, 40.f}}
-   ,m_D_string_button{"D", [this](){ m_pick_notes(filterNotes(noteOctavesForDString())); }, {40.f, 40.f}}
-   ,m_G_string_button{"G", [this](){ m_pick_notes(filterNotes(noteOctavesForGString())); }, {40.f, 40.f}}
-   ,m_B_string_button{"B", [this](){ m_pick_notes(filterNotes(noteOctavesForBString())); }, {40.f, 40.f}}
-   ,m_e_string_button{"e", [this](){ m_pick_notes(filterNotes(noteOctavesForeString())); }, {40.f, 40.f}}
+   ,m_E_string_button{"E", {40.f, 40.f}}
+   ,m_A_string_button{"A", {40.f, 40.f}}
+   ,m_D_string_button{"D", {40.f, 40.f}}
+   ,m_G_string_button{"G", {40.f, 40.f}}
+   ,m_B_string_button{"B", {40.f, 40.f}}
+   ,m_e_string_button{"e", {40.f, 40.f}}
    ,m_sharps_checkbox{"Sharps"}
    ,m_flats_checkbox{"Flats"}
 {
@@ -107,7 +108,7 @@ std::vector<NoteOctave> StaffSetup::filterNotes(const std::vector<NoteOctave>& n
 
 void StaffSetup::mouseMoved(const sf::Vector2f& pos)
 {
-   auto fn = std::bind(std::mem_fn(&Button::mouseMoved), std::placeholders::_1, pos);
+   auto fn = std::bind(std::mem_fn(&Pressable::mouseMoved), std::placeholders::_1, pos);
 
    std::ranges::for_each(m_major_buttons, fn);
    std::ranges::for_each(m_minor_buttons, fn);
@@ -120,14 +121,13 @@ void StaffSetup::mouseMoved(const sf::Vector2f& pos)
    fn(m_G_string_button);
    fn(m_B_string_button);
    fn(m_e_string_button);
-
-   m_sharps_checkbox.mouseMoved(pos);
-   m_flats_checkbox.mouseMoved(pos);
+   fn(m_sharps_checkbox);
+   fn(m_flats_checkbox);
 }
 
 void StaffSetup::mouseDown(const sf::Vector2f& pos)
 {
-   auto fn = std::bind(std::mem_fn(&Button::mouseDown), std::placeholders::_1, pos);
+   auto fn = std::bind(std::mem_fn(&Pressable::mouseDown), std::placeholders::_1, pos);
 
    std::ranges::for_each(m_major_buttons, fn);
    std::ranges::for_each(m_minor_buttons, fn);
@@ -140,14 +140,13 @@ void StaffSetup::mouseDown(const sf::Vector2f& pos)
    fn(m_G_string_button);
    fn(m_B_string_button);
    fn(m_e_string_button);
-
-   m_sharps_checkbox.mouseDown(pos);
-   m_flats_checkbox.mouseDown(pos);
+   fn(m_sharps_checkbox);
+   fn(m_flats_checkbox);
 }
 
 void StaffSetup::mouseUp(const sf::Vector2f& pos)
 {
-   auto fn = std::bind(std::mem_fn(&Button::mouseUp), std::placeholders::_1, pos);
+   auto fn = std::bind(std::mem_fn(&Pressable::mouseUp), std::placeholders::_1, pos);
 
    std::ranges::for_each(m_major_buttons, fn);
    std::ranges::for_each(m_minor_buttons, fn);
@@ -160,9 +159,8 @@ void StaffSetup::mouseUp(const sf::Vector2f& pos)
    fn(m_G_string_button);
    fn(m_B_string_button);
    fn(m_e_string_button);
-
-   m_sharps_checkbox.mouseUp(pos);
-   m_flats_checkbox.mouseUp(pos);
+   fn(m_sharps_checkbox);
+   fn(m_flats_checkbox);
 }
 
 

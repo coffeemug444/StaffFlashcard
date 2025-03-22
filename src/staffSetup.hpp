@@ -2,6 +2,7 @@
 
 #include "button.hpp"
 #include "checkbox.hpp"
+#include "toggleButton.hpp"
 #include "types.hpp"
 
 #include <SFML/Graphics.hpp>
@@ -31,12 +32,12 @@ private:
 
    sf::Text m_string_label;
 
-   Button m_E_string_button;
-   Button m_A_string_button;
-   Button m_D_string_button;
-   Button m_G_string_button;
-   Button m_B_string_button;
-   Button m_e_string_button;
+   ToggleButton m_E_string_button;
+   ToggleButton m_A_string_button;
+   ToggleButton m_D_string_button;
+   ToggleButton m_G_string_button;
+   ToggleButton m_B_string_button;
+   ToggleButton m_e_string_button;
 
    Checkbox m_sharps_checkbox;
    Checkbox m_flats_checkbox;

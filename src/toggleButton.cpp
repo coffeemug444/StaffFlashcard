@@ -5,6 +5,7 @@ ToggleButton::ToggleButton(const std::string& text, sf::Vector2f size)
     :m_text{FONT, text} // size??
     ,m_background{size != sf::Vector2f{} ? size : sf::Vector2f{m_text.getGlobalBounds().size.x + 5.f, 40.f}}
     ,m_pressing{false}
+    ,m_pressed{false}
 {
     m_background.setFillColor(STANDARD_COLOR);
     m_text.move({(size.x - m_text.getGlobalBounds().size.x)/2.f, 0.f});

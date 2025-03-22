@@ -1,8 +1,9 @@
 #pragma once
 
+#include "pressable.hpp"
 #include <SFML/Graphics.hpp>
 
-class ToggleButton : public sf::Drawable
+class ToggleButton : public sf::Drawable, public Pressable
 {
 public:
    ToggleButton(const std::string& text, sf::Vector2f size = {});
@@ -12,9 +13,9 @@ public:
    void setPosition(const sf::Vector2f& pos);
    void move(const sf::Vector2f& diff);
 
-   void mouseMoved(const sf::Vector2f& pos);
-   void mouseDown(const sf::Vector2f& pos);
-   void mouseUp(const sf::Vector2f& pos);
+   void mouseMoved(const sf::Vector2f& pos) override;
+   void mouseDown(const sf::Vector2f& pos) override;
+   void mouseUp(const sf::Vector2f& pos) override;
 
    void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
