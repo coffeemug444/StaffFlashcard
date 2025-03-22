@@ -13,45 +13,45 @@ constexpr std::array ALL_OCTAVES = std::to_array({0,1,2,3});
 StaffSetup::StaffSetup(std::function<void(const std::vector<NoteOctave>&)> pick_notes)
    :m_pick_notes{pick_notes}
    ,m_major_buttons{
-      {"C major", {100.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::C, Key::MAJOR), ALL_OCTAVES))},
-      {"D major", {100.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::D, Key::MAJOR), ALL_OCTAVES))},
-      {"E major", {100.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::E, Key::MAJOR), ALL_OCTAVES))},
-      {"F major", {100.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::F, Key::MAJOR), ALL_OCTAVES))},
-      {"G major", {100.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::G, Key::MAJOR), ALL_OCTAVES))},
-      {"A major", {100.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::A, Key::MAJOR), ALL_OCTAVES))}
+      {"C major", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::C, Key::MAJOR), ALL_OCTAVES)), {100.f, 40.f}},
+      {"D major", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::D, Key::MAJOR), ALL_OCTAVES)), {100.f, 40.f}},
+      {"E major", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::E, Key::MAJOR), ALL_OCTAVES)), {100.f, 40.f}},
+      {"F major", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::F, Key::MAJOR), ALL_OCTAVES)), {100.f, 40.f}},
+      {"G major", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::G, Key::MAJOR), ALL_OCTAVES)), {100.f, 40.f}},
+      {"A major", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::A, Key::MAJOR), ALL_OCTAVES)), {100.f, 40.f}}
    }
    ,m_minor_buttons{
-      {"c minor", {100.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::C, Key::MINOR), ALL_OCTAVES))},
-      {"d minor", {100.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::D, Key::MINOR), ALL_OCTAVES))},
-      {"e minor", {100.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::E, Key::MINOR), ALL_OCTAVES))},
-      {"f minor", {100.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::F, Key::MINOR), ALL_OCTAVES))},
-      {"g minor", {100.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::G, Key::MINOR), ALL_OCTAVES))},
-      {"a minor", {100.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::A, Key::MINOR), ALL_OCTAVES))}
+      {"c minor", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::C, Key::MINOR), ALL_OCTAVES)), {100.f, 40.f}},
+      {"d minor", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::D, Key::MINOR), ALL_OCTAVES)), {100.f, 40.f}},
+      {"e minor", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::E, Key::MINOR), ALL_OCTAVES)), {100.f, 40.f}},
+      {"f minor", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::F, Key::MINOR), ALL_OCTAVES)), {100.f, 40.f}},
+      {"g minor", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::G, Key::MINOR), ALL_OCTAVES)), {100.f, 40.f}},
+      {"a minor", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::A, Key::MINOR), ALL_OCTAVES)), {100.f, 40.f}}
    }
    ,m_major_pentatonic_buttons{
-      {"C major pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::C, Key::MAJOR_PENTATONIC), ALL_OCTAVES))},
-      {"D major pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::D, Key::MAJOR_PENTATONIC), ALL_OCTAVES))},
-      {"E major pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::E, Key::MAJOR_PENTATONIC), ALL_OCTAVES))},
-      {"F major pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::F, Key::MAJOR_PENTATONIC), ALL_OCTAVES))},
-      {"G major pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::G, Key::MAJOR_PENTATONIC), ALL_OCTAVES))},
-      {"A major pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::A, Key::MAJOR_PENTATONIC), ALL_OCTAVES))}
+      {"C major pentatonic", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::C, Key::MAJOR_PENTATONIC), ALL_OCTAVES)), {250.f, 40.f}},
+      {"D major pentatonic", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::D, Key::MAJOR_PENTATONIC), ALL_OCTAVES)), {250.f, 40.f}},
+      {"E major pentatonic", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::E, Key::MAJOR_PENTATONIC), ALL_OCTAVES)), {250.f, 40.f}},
+      {"F major pentatonic", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::F, Key::MAJOR_PENTATONIC), ALL_OCTAVES)), {250.f, 40.f}},
+      {"G major pentatonic", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::G, Key::MAJOR_PENTATONIC), ALL_OCTAVES)), {250.f, 40.f}},
+      {"A major pentatonic", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::A, Key::MAJOR_PENTATONIC), ALL_OCTAVES)), {250.f, 40.f}}
    }
    ,m_minor_pentatonic_buttons{
-      {"c minor pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::C, Key::MINOR_PENTATONIC), ALL_OCTAVES))},
-      {"d minor pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::D, Key::MINOR_PENTATONIC), ALL_OCTAVES))},
-      {"e minor pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::E, Key::MINOR_PENTATONIC), ALL_OCTAVES))},
-      {"f minor pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::F, Key::MINOR_PENTATONIC), ALL_OCTAVES))},
-      {"g minor pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::G, Key::MINOR_PENTATONIC), ALL_OCTAVES))},
-      {"a minor pentatonic", {250.f, 40.f}, std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::A, Key::MINOR_PENTATONIC), ALL_OCTAVES))}
+      {"c minor pentatonic", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::C, Key::MINOR_PENTATONIC), ALL_OCTAVES)), {250.f, 40.f}},
+      {"d minor pentatonic", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::D, Key::MINOR_PENTATONIC), ALL_OCTAVES)), {250.f, 40.f}},
+      {"e minor pentatonic", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::E, Key::MINOR_PENTATONIC), ALL_OCTAVES)), {250.f, 40.f}},
+      {"f minor pentatonic", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::F, Key::MINOR_PENTATONIC), ALL_OCTAVES)), {250.f, 40.f}},
+      {"g minor pentatonic", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::G, Key::MINOR_PENTATONIC), ALL_OCTAVES)), {250.f, 40.f}},
+      {"a minor pentatonic", std::bind(m_pick_notes, notesInOctaves(getNotesForKey(Note::A, Key::MINOR_PENTATONIC), ALL_OCTAVES)), {250.f, 40.f}}
    }
-   ,m_first_position_button{"First position", {180.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForFirstPosition())); }}
+   ,m_first_position_button{"First position", [this](){ m_pick_notes(filterNotes(noteOctavesForFirstPosition())); }, {180.f, 40.f}}
    ,m_string_label{FONT, "String: "}
-   ,m_E_string_button{"E", {40.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForEString())); }}
-   ,m_A_string_button{"A", {40.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForAString())); }}
-   ,m_D_string_button{"D", {40.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForDString())); }}
-   ,m_G_string_button{"G", {40.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForGString())); }}
-   ,m_B_string_button{"B", {40.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForBString())); }}
-   ,m_e_string_button{"e", {40.f, 40.f}, [this](){ m_pick_notes(filterNotes(noteOctavesForeString())); }}
+   ,m_E_string_button{"E", [this](){ m_pick_notes(filterNotes(noteOctavesForEString())); }, {40.f, 40.f}}
+   ,m_A_string_button{"A", [this](){ m_pick_notes(filterNotes(noteOctavesForAString())); }, {40.f, 40.f}}
+   ,m_D_string_button{"D", [this](){ m_pick_notes(filterNotes(noteOctavesForDString())); }, {40.f, 40.f}}
+   ,m_G_string_button{"G", [this](){ m_pick_notes(filterNotes(noteOctavesForGString())); }, {40.f, 40.f}}
+   ,m_B_string_button{"B", [this](){ m_pick_notes(filterNotes(noteOctavesForBString())); }, {40.f, 40.f}}
+   ,m_e_string_button{"e", [this](){ m_pick_notes(filterNotes(noteOctavesForeString())); }, {40.f, 40.f}}
    ,m_sharps_checkbox{"Sharps"}
    ,m_flats_checkbox{"Flats"}
 {

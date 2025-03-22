@@ -1,25 +1,16 @@
 #include "button.hpp"
 #include "constants.hpp"
+#include <SFML/System/Vector2.hpp>
 
 
-Button::Button(const std::string& text, const sf::Vector2f& size, std::function<void()> on_click)
+Button::Button(const std::string& text, std::function<void()> on_click, sf::Vector2f size)
     :m_text{FONT, text} // size??
-    ,m_background{size}
+    ,m_background{size != sf::Vector2f{} ? size : sf::Vector2f{m_text.getGlobalBounds().size.x + 5.f, 40.f}}
     ,m_on_click{on_click}
     ,m_pressing{false}
 {
     m_background.setFillColor(STANDARD_COLOR);
-    m_text.move({(size.x - m_text.getGlobalBounds().size.x)/2.f, 0.f});
-}
-
-
-Button::Button(const std::string& text, std::function<void()> on_click)
-    :m_text{FONT, text} // size??
-    ,m_background{sf::Vector2f{m_text.getGlobalBounds().size.x + 5.f, 40.f}}
-    ,m_on_click{on_click}
-    ,m_pressing{false}
-{
-    m_background.setFillColor(STANDARD_COLOR);
+    m_text.move({(m_background.getSize().x - m_text.getGlobalBounds().size.x)/2.f, 0.f});
 }
 
 void Button::setPosition(const sf::Vector2f& pos)

@@ -7,8 +7,7 @@
 class Button : public sf::Drawable
 {
 public:
-    Button(const std::string& text, const sf::Vector2f& size, std::function<void()> on_click);
-    Button(const std::string& text, std::function<void()> on_click);
+    Button(const std::string& text, std::function<void()> on_click, sf::Vector2f size = {});
 
     void setPosition(const sf::Vector2f& pos);
     void move(const sf::Vector2f& diff);
