@@ -1,4 +1,5 @@
 #include "audioSetup.hpp"
+#include "audioProcessor.hpp"
 
 #include <ranges>
 #include <fstream>
@@ -18,20 +19,12 @@ static std::vector<Button> getButtons(const std::vector<std::string>& devices, s
 
 
 AudioSetup::AudioSetup(
-      const std::vector<std::string>& devices, 
       std::function<void(const std::string&)> pick_audio_device,
       std::function<void(const sf::Vector2f&)> resize_callback)
-   :m_buttons{getButtons(devices, pick_audio_device)}
+   : m_pick_audio_device_callback{pick_audio_device}
+   , m_resize_callback_callback{resize_callback}
+   , m_buttons{}
 {
-   float longest = 0.f;
-   for (auto [idx, button] : std::ranges::views::enumerate(m_buttons))
-   {
-      button.move({0,idx*50.f});
-      longest = std::max(longest, button.getSize().x);
-   }
-
-   resize_callback({longest + 10.f,50.f*m_buttons.size() - 10.f});
-
    std::string line;
    {
       std::ifstream file("saved_device.dat");
@@ -39,10 +32,27 @@ AudioSetup::AudioSetup(
       std::getline(file, line);
    }
 
-   if (std::ranges::contains(devices, line))
+   if (std::ranges::contains(AudioProcessor::getAvailableDevices(), line))
    {
       pick_audio_device(line);
+
+      return;
    }
+
+   setupButtons();
+}
+
+void AudioSetup::setupButtons()
+{
+   m_buttons = getButtons(AudioProcessor::getAvailableDevices(), m_pick_audio_device_callback);
+   float longest = 0.f;
+   for (auto [idx, button] : std::ranges::views::enumerate(m_buttons))
+   {
+      button.move({0,idx*50.f});
+      longest = std::max(longest, button.getSize().x);
+   }
+
+   m_resize_callback_callback({longest + 10.f,50.f*m_buttons.size() - 10.f});
 }
 
 void AudioSetup::mouseMoved(const sf::Vector2f& pos)

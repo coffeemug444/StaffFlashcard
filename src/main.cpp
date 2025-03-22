@@ -59,7 +59,7 @@ void Main::pollEvents()
                }
                if (m_stage == Stage::NOTES_SETUP)
                {
-                  // gotoAudioSetup();
+                  gotoAudioSetup();
                }
             default: 
                break;
@@ -134,9 +134,9 @@ void Main::pickAudioDevice(const std::string& device_name)
 
 void Main::gotoAudioSetup()
 {
+   m_audio_processor.stop();
    m_stage = Stage::AUDIO_SETUP;
-
-   // and the rest as well
+   m_audio_setup.setupButtons();
 }
 
 void Main::gotoNotesSetup()
@@ -168,7 +168,6 @@ Main::Main()
    ,m_stage{Stage::AUDIO_SETUP}
    ,m_font{[](){ sf::Font font; assert(font.openFromFile("font.ttf")); return font; }()}
    ,m_audio_setup{
-      AudioProcessor::getAvailableDevices(), 
       std::bind(&Main::pickAudioDevice, this, std::placeholders::_1),
       std::bind(&Main::setWindowSize, this, std::placeholders::_1)}
 {
