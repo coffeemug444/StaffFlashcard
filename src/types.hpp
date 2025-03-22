@@ -4,6 +4,7 @@
 #include <vector>
 #include <iosfwd>
 #include <span>
+#include <string>
 
 enum class Note
 {
@@ -46,7 +47,11 @@ enum class NoteModifier
 };
 
 using NoteOctave = std::pair<Note, int>;
-using NoteSet = std::pair<std::vector<NoteOctave>, std::string>;
+
+struct NoteSet {
+   std::vector<NoteOctave> notes;
+   std::string name;
+};
 
 int mapNoteToToneIndex(NoteOctave note_octave);
 int mapNoteToStaffIndex(NoteOctave note_octave);

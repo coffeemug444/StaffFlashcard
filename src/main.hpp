@@ -37,6 +37,5 @@ private:
    AudioProcessor m_audio_processor;
    Stage m_stage;
    
-   sf::Font m_font;
    AudioSetup m_audio_setup;
 };

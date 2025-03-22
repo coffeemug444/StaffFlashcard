@@ -48,7 +48,7 @@ private:
 
    float m_note_height;
 
-   sf::Font m_font;
+   sf::Text m_set_name;
    sf::Text m_cleff;
    sf::Text m_lines;
    sf::Text m_extended_down_1_staff;

@@ -149,7 +149,7 @@ void Main::gotoNotesSetup()
 
 void Main::gotoRunning(const std::vector<NoteSet>& notes)
 {
-   setWindowSize({270, 460});
+   setWindowSize({270, 510});
    m_staff.setNotes(notes);
    m_stage = Stage::RUNNING;
 }
@@ -168,7 +168,6 @@ Main::Main()
    ,m_staff_setup{std::bind(&Main::gotoRunning, this, std::placeholders::_1)}
    ,m_audio_processor{std::bind(&Staff::guessNote, &m_staff, std::placeholders::_1)}
    ,m_stage{Stage::AUDIO_SETUP}
-   ,m_font{[](){ sf::Font font; assert(font.openFromFile("font.ttf")); return font; }()}
    ,m_audio_setup{
       std::bind(&Main::pickAudioDevice, this, std::placeholders::_1),
       std::bind(&Main::setWindowSize, this, std::placeholders::_1)}

@@ -13,7 +13,7 @@ constexpr std::array ALL_OCTAVES = std::to_array({0,1,2,3});
 
 static std::vector<NoteSet> getNoteSet(Note note, Key key, std::span<const int> octaves, std::string_view name)
 {
-   return {NoteSet{notesInOctaves(getNotesForKey(note, key), octaves), name}};
+   return {NoteSet{notesInOctaves(getNotesForKey(note, key), octaves), std::string{name}}};
 }
 
 StaffSetup::StaffSetup(std::function<void(const std::vector<NoteSet>&)> pick_notes)
