@@ -143,7 +143,7 @@ void Main::gotoAudioSetup()
 
 void Main::gotoNotesSetup()
 {
-   setWindowSize({760, 400});
+   setWindowSize({760, 500});
    m_stage = Stage::NOTES_SETUP;
 }
 

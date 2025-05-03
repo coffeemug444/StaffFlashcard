@@ -4,6 +4,7 @@
 #include <utility>
 #include <ostream>
 #include <ranges>
+#include <cassert>
 
 int mapNoteToStaffIndex(NoteOctave note_octave)
 {
@@ -134,178 +135,78 @@ std::vector<NoteOctave> notesInOctaves(std::span<const Note> notes, std::span<co
    return out;
 }
 
-std::vector<NoteOctave> noteOctavesForFirstPosition()
+std::vector<NoteOctave> noteOctavesForFretPosition(int string, int fret)
 {
+   int note = fret;
+   note += [string]() {
+      switch (string)
+      {
+      case 0: return 0;
+      case 1: return 5;
+      case 2: return 10;
+      case 3: return 15;
+      case 4: return 19;
+      case 5: return 24;
+      default: assert(false);
+      }
+   }();
+
+   int octave = note / 12;
+   note = note % 12;
+
+   switch (note)
+   {
    using enum Note;
-   auto notes = notesInOctaves(
-      std::to_array({
-         E, Es,
-         Fb, F, Fs,
-         Gb, G, Gs,
-         Ab, A, As,
-         Bb, B, Bs,
-         Cb, C, Cs,
-         Db, D, Ds
-      }),
-      std::to_array({0}));
-   auto highernotes = notesInOctaves(
-      std::to_array({
-         Eb, E, Es,
-         Fb, F, Fs,
-         Gb, G, Gs,
-         Ab, A, As,
-         Bb, B, Bs,
-         Cb, C, Cs,
-         Db, D, Ds
-      }),
-      std::to_array({1}));
-   auto evenhighernotes = notesInOctaves(
-      std::to_array({
-         Eb, E, Es,
-         Fb, F, Fs,
-         Gb, G, Gs
-      }),
-      std::to_array({2}));
-   notes.insert(end(notes), begin(highernotes), end(highernotes));
-   notes.insert(end(notes), begin(evenhighernotes), end(evenhighernotes));
-   return notes;
+   case 0:  return {{E,  octave}, {Fb, octave}};
+   case 1:  return {{Es, octave}, {F,  octave}};
+   case 2:  return {{Fs, octave}, {Gb, octave}};
+   case 3:  return {{G,  octave}              };
+   case 4:  return {{Gs, octave}, {Ab, octave}};
+   case 5:  return {{A,  octave}              };
+   case 6:  return {{As, octave}, {Bb, octave}};
+   case 7:  return {{B,  octave}, {Cb, octave}};
+   case 8:  return {{Bs, octave}, {C,  octave}};
+   case 9:  return {{Cs, octave}, {Db, octave}};
+   case 10: return {{D,  octave}              };
+   case 11: return {{Ds, octave}, {Eb, octave+1}};
+   default: assert(false);
+   }
 }
 
-std::vector<NoteOctave> noteOctavesForEString()
+
+std::vector<NoteOctave> noteOctavesForString(int string)
 {
    using enum Note;
-   auto notes = notesInOctaves(
-      std::to_array({
-         E, Es,
-         Fb, F, Fs,
-         Gb, G, Gs,
-         Ab, A, As,
-         Bb, B, Bs,
-         Cb, C, Cs,
-         Db, D, Ds
-      }),
-      std::to_array({0}));
-   auto highernotes = notesInOctaves(
-      std::to_array({
-         Eb, E
-      }),
-      std::to_array({1}));
-   notes.insert(end(notes), begin(highernotes), end(highernotes));
-   return notes;
+   namespace rv = std::ranges::views;
+
+   return rv::join(rv::iota(0,13) | rv::transform([string](int x) { return noteOctavesForFretPosition(string, x); })) | std::ranges::to<std::vector>();
 }
 
-std::vector<NoteOctave> noteOctavesForAString()
-{
-   using enum Note;
-   auto notes = notesInOctaves(
-      std::to_array({
-         A, As,
-         Bb, B, Bs,
-         Cb, C, Cs,
-         Db, D, Ds
-      }),
-      std::to_array({0}));
-   auto highernotes = notesInOctaves(
-      std::to_array({
-         Eb, E, Es,
-         Fb, F, Fs,
-         Gb, G, Gs,
-         Ab, A
-      }),
-      std::to_array({1}));
-   notes.insert(end(notes), begin(highernotes), end(highernotes));
-   return notes;
-}
 
-std::vector<NoteOctave> noteOctavesForDString()
-{
-   using enum Note;
-   auto notes = notesInOctaves(
-      std::to_array({
-         D, Ds,
-      }),
-      std::to_array({0}));
-   auto highernotes = notesInOctaves(
-      std::to_array({
-         Eb, E, Es,
-         Fb, F, Fs,
-         Gb, G, Gs,
-         Ab, A, As,
-         Bb, B, Bs,
-         Cb, C, Cs,
-         Db, D
-      }),
-      std::to_array({1}));
-   notes.insert(end(notes), begin(highernotes), end(highernotes));
-   return notes;
-}
 
-std::vector<NoteOctave> noteOctavesForGString()
+std::vector<NoteOctave> noteOctavesForPosition(int position)
 {
    using enum Note;
-   auto notes = notesInOctaves(
-      std::to_array({
-         G, Gs,
-         Ab, A, As,
-         Bb, B, Bs,
-         Cb, C, Cs,
-         Db, D, Ds,
-      }),
-      std::to_array({1}));
-   auto highernotes = notesInOctaves(
-      std::to_array({
-         Eb, E, Es,
-         Fb, F, Fs,
-         Gb, G
-      }),
-      std::to_array({2}));
-   notes.insert(end(notes), begin(highernotes), end(highernotes));
-   return notes;
-}
+   namespace rv = std::ranges::views;
+   
+   auto notes = rv::join(
+      std::ranges::views::cartesian_product(rv::iota(0, 6), rv::iota(position, position + 4)) 
+    | rv::transform([](auto string_fret) {
+         auto [string, fret] = string_fret;
+         return noteOctavesForFretPosition(string, fret);
+      })) 
+    | std::ranges::to<std::vector>();
+   
+   if (position == 1)
+   {
+      // add open strings
+      notes.push_back({E, 0});
+      notes.push_back({A, 0});
+      notes.push_back({D, 0});
+      notes.push_back({G, 1});
+      notes.push_back({E, 2});
+   }
 
-std::vector<NoteOctave> noteOctavesForBString()
-{
-   using enum Note;
-   auto notes = notesInOctaves(
-      std::to_array({
-         Bb, B, Bs,
-         Cb, C, Cs,
-         Db, D, Ds,
-      }),
-      std::to_array({1}));
-   auto highernotes = notesInOctaves(
-      std::to_array({
-         Eb, E, Es,
-         Fb, F, Fs,
-         Gb, G, Gs,
-         Ab, A, As,
-         Bb, B
-      }),
-      std::to_array({2}));
-   notes.insert(end(notes), begin(highernotes), end(highernotes));
-   return notes;
-}
-
-std::vector<NoteOctave> noteOctavesForeString()
-{
-   using enum Note;
-   auto notes = notesInOctaves(
-      std::to_array({
-         E, Es,
-         Fb, F, Fs,
-         Gb, G, Gs,
-         Ab, A, As,
-         Bb, B, Bs,
-         Cb, C, Cs,
-         Db, D, Ds
-      }),
-      std::to_array({2}));
-   auto highernotes = notesInOctaves(
-      std::to_array({
-         Eb, E
-      }),
-      std::to_array({3}));
-   notes.insert(end(notes), begin(highernotes), end(highernotes));
    return notes;
 }
 

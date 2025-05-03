@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <algorithm>
 #include <ranges>
 #include <algorithm>
@@ -15,6 +16,8 @@ static std::vector<NoteSet> getNoteSet(Note note, Key key, std::span<const int> 
 {
    return {NoteSet{notesInOctaves(getNotesForKey(note, key), octaves), std::string{name}}};
 }
+
+constexpr sf::Vector2f POS_SIZE = {55.f, 40.f};
 
 StaffSetup::StaffSetup(std::function<void(const std::vector<NoteSet>&)> pick_notes)
    :m_pick_notes{pick_notes}
@@ -50,7 +53,17 @@ StaffSetup::StaffSetup(std::function<void(const std::vector<NoteSet>&)> pick_not
       {"g minor pentatonic", std::bind(m_pick_notes, getNoteSet(Note::G, Key::MINOR_PENTATONIC, ALL_OCTAVES, "g minor pentatonic")), {250.f, 40.f}},
       {"a minor pentatonic", std::bind(m_pick_notes, getNoteSet(Note::A, Key::MINOR_PENTATONIC, ALL_OCTAVES, "a minor pentatonic")), {250.f, 40.f}}
    }
-   ,m_first_position_button{"First position", [this](){ m_pick_notes(std::vector{NoteSet{filterNotes(noteOctavesForFirstPosition()), {"First position"}}}); }, {180.f, 40.f}}
+   ,m_position_label{FONT, "Position: "}
+   ,m_I_position_button{"I", POS_SIZE}
+   ,m_II_position_button{"II", POS_SIZE}
+   ,m_III_position_button{"III", POS_SIZE}
+   ,m_IV_position_button{"IV", POS_SIZE}
+   ,m_V_position_button{"V", POS_SIZE}
+   ,m_VI_position_button{"VI", POS_SIZE}
+   ,m_VII_position_button{"VII", POS_SIZE}
+   ,m_VIII_position_button{"VIII", POS_SIZE}
+   ,m_IX_position_button{"IX", POS_SIZE}
+   ,m_position_go_button{"->", std::bind(&StaffSetup::useSelectedPositions, this), {40.f, 40.f}}
    ,m_string_label{FONT, "String: "}
    ,m_E_string_button{"E", {40.f, 40.f}}
    ,m_A_string_button{"A", {40.f, 40.f}}
@@ -58,7 +71,7 @@ StaffSetup::StaffSetup(std::function<void(const std::vector<NoteSet>&)> pick_not
    ,m_G_string_button{"G", {40.f, 40.f}}
    ,m_B_string_button{"B", {40.f, 40.f}}
    ,m_e_string_button{"e", {40.f, 40.f}}
-   ,m_go_button{"->", std::bind(&StaffSetup::useSelectedStrings, this), {40.f, 40.f}}
+   ,m_string_go_button{"->", std::bind(&StaffSetup::useSelectedStrings, this), {40.f, 40.f}}
    ,m_sharps_checkbox{"Sharps"}
    ,m_flats_checkbox{"Flats"}
 {
@@ -80,16 +93,29 @@ StaffSetup::StaffSetup(std::function<void(const std::vector<NoteSet>&)> pick_not
       button.move({510.f,idx*50.f});
    }
 
-   m_first_position_button.move({0.f,m_major_buttons.size()*50.f});
+   m_position_label.move({0.f,m_major_buttons.size()*50.f});
+   m_I_position_button.move({   120.f + 0*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 0*(POS_SIZE.y + 10.f)});
+   m_II_position_button.move({  120.f + 1*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 0*(POS_SIZE.y + 10.f)});
+   m_III_position_button.move({ 120.f + 2*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 0*(POS_SIZE.y + 10.f)});
+   
+   m_IV_position_button.move({  120.f + 0*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 1*(POS_SIZE.y + 10.f)});
+   m_V_position_button.move({   120.f + 1*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 1*(POS_SIZE.y + 10.f)});
+   m_VI_position_button.move({  120.f + 2*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 1*(POS_SIZE.y + 10.f)});
+   
+   m_VII_position_button.move({ 120.f + 0*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 2*(POS_SIZE.y + 10.f)});
+   m_VIII_position_button.move({120.f + 1*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 2*(POS_SIZE.y + 10.f)});
+   m_IX_position_button.move({  120.f + 2*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 2*(POS_SIZE.y + 10.f)});
 
-   m_string_label.move({0.f,m_major_buttons.size()*50.f + 50.f});
-   m_E_string_button.move({120.f + 0*50.f,m_major_buttons.size()*50 + 50.f});
-   m_A_string_button.move({120.f + 1*50.f,m_major_buttons.size()*50 + 50.f});
-   m_D_string_button.move({120.f + 2*50.f,m_major_buttons.size()*50 + 50.f});
-   m_G_string_button.move({120.f + 3*50.f,m_major_buttons.size()*50 + 50.f});
-   m_B_string_button.move({120.f + 4*50.f,m_major_buttons.size()*50 + 50.f});
-   m_e_string_button.move({120.f + 5*50.f,m_major_buttons.size()*50 + 50.f});
-   m_go_button.move({120.f + 6*50.f,m_major_buttons.size()*50 + 50.f});
+   m_position_go_button.move({120.f + 6*50.f,m_major_buttons.size()*50.f + 1*(POS_SIZE.y + 10.f)});
+
+   m_string_label.move({0.f,m_major_buttons.size()*50.f + 3*(POS_SIZE.y + 10.f)});
+   m_E_string_button.move({120.f + 0*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
+   m_A_string_button.move({120.f + 1*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
+   m_D_string_button.move({120.f + 2*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
+   m_G_string_button.move({120.f + 3*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
+   m_B_string_button.move({120.f + 4*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
+   m_e_string_button.move({120.f + 5*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
+   m_string_go_button.move({120.f + 6*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
 
    m_sharps_checkbox.move({550.f,m_major_buttons.size()*50.f});
    m_flats_checkbox.move({550.f,(m_major_buttons.size()+1)*50.f});
@@ -119,27 +145,73 @@ void StaffSetup::useSelectedStrings()
    std::vector<NoteSet> note_sets;
    if (m_E_string_button.checked())
    {
-      note_sets.push_back({filterNotes(noteOctavesForEString()), {"E"}});
+      note_sets.push_back({filterNotes(noteOctavesForString(0)), {"E"}});
    }
    if (m_A_string_button.checked())
    {
-      note_sets.push_back({filterNotes(noteOctavesForAString()), {"A"}});
+      note_sets.push_back({filterNotes(noteOctavesForString(1)), {"A"}});
    }
    if (m_D_string_button.checked())
    {
-      note_sets.push_back({filterNotes(noteOctavesForDString()), {"D"}});
+      note_sets.push_back({filterNotes(noteOctavesForString(2)), {"D"}});
    }
    if (m_G_string_button.checked())
    {
-      note_sets.push_back({filterNotes(noteOctavesForGString()), {"G"}});
+      note_sets.push_back({filterNotes(noteOctavesForString(3)), {"G"}});
    }
    if (m_B_string_button.checked())
    {
-      note_sets.push_back({filterNotes(noteOctavesForBString()), {"B"}});
+      note_sets.push_back({filterNotes(noteOctavesForString(4)), {"B"}});
    }
    if (m_e_string_button.checked())
    {
-      note_sets.push_back({filterNotes(noteOctavesForeString()), {"e"}});
+      note_sets.push_back({filterNotes(noteOctavesForString(5)), {"e"}});
+   }
+
+   if (note_sets.empty()) return;
+
+   m_pick_notes(note_sets);
+}
+
+
+void StaffSetup::useSelectedPositions()
+{
+   std::vector<NoteSet> note_sets;
+   if (m_I_position_button.checked())
+   {
+      note_sets.push_back({filterNotes(noteOctavesForPosition(1)), {"I"}});
+   }
+   if (m_II_position_button.checked())
+   {
+      note_sets.push_back({filterNotes(noteOctavesForPosition(2)), {"II"}});
+   }
+   if (m_III_position_button.checked())
+   {
+      note_sets.push_back({filterNotes(noteOctavesForPosition(3)), {"III"}});
+   }
+   if (m_IV_position_button.checked())
+   {
+      note_sets.push_back({filterNotes(noteOctavesForPosition(4)), {"IV"}});
+   }
+   if (m_V_position_button.checked())
+   {
+      note_sets.push_back({filterNotes(noteOctavesForPosition(5)), {"V"}});
+   }
+   if (m_VI_position_button.checked())
+   {
+      note_sets.push_back({filterNotes(noteOctavesForPosition(6)), {"VI"}});
+   }
+   if (m_VII_position_button.checked())
+   {
+      note_sets.push_back({filterNotes(noteOctavesForPosition(7)), {"VII"}});
+   }
+   if (m_VIII_position_button.checked())
+   {
+      note_sets.push_back({filterNotes(noteOctavesForPosition(8)), {"VIII"}});
+   }
+   if (m_IX_position_button.checked())
+   {
+      note_sets.push_back({filterNotes(noteOctavesForPosition(9)), {"IX"}});
    }
 
    if (note_sets.empty()) return;
@@ -155,14 +227,23 @@ void StaffSetup::mouseMoved(const sf::Vector2f& pos)
    std::ranges::for_each(m_minor_buttons, fn);
    std::ranges::for_each(m_major_pentatonic_buttons, fn);
    std::ranges::for_each(m_minor_pentatonic_buttons, fn);
-   fn(m_first_position_button);
+   fn(m_I_position_button);
+   fn(m_II_position_button);
+   fn(m_III_position_button);
+   fn(m_IV_position_button);
+   fn(m_V_position_button);
+   fn(m_VI_position_button);
+   fn(m_VII_position_button);
+   fn(m_VIII_position_button);
+   fn(m_IX_position_button);
+   fn(m_position_go_button);
    fn(m_E_string_button);
    fn(m_A_string_button);
    fn(m_D_string_button);
    fn(m_G_string_button);
    fn(m_B_string_button);
    fn(m_e_string_button);
-   fn(m_go_button);
+   fn(m_string_go_button);
    fn(m_sharps_checkbox);
    fn(m_flats_checkbox);
 }
@@ -175,14 +256,23 @@ void StaffSetup::mouseDown(const sf::Vector2f& pos)
    std::ranges::for_each(m_minor_buttons, fn);
    std::ranges::for_each(m_major_pentatonic_buttons, fn);
    std::ranges::for_each(m_minor_pentatonic_buttons, fn);
-   fn(m_first_position_button);
+   fn(m_I_position_button);
+   fn(m_II_position_button);
+   fn(m_III_position_button);
+   fn(m_IV_position_button);
+   fn(m_V_position_button);
+   fn(m_VI_position_button);
+   fn(m_VII_position_button);
+   fn(m_VIII_position_button);
+   fn(m_IX_position_button);
+   fn(m_position_go_button);
    fn(m_E_string_button);
    fn(m_A_string_button);
    fn(m_D_string_button);
    fn(m_G_string_button);
    fn(m_B_string_button);
    fn(m_e_string_button);
-   fn(m_go_button);
+   fn(m_string_go_button);
    fn(m_sharps_checkbox);
    fn(m_flats_checkbox);
 }
@@ -195,14 +285,23 @@ void StaffSetup::mouseUp(const sf::Vector2f& pos)
    std::ranges::for_each(m_minor_buttons, fn);
    std::ranges::for_each(m_major_pentatonic_buttons, fn);
    std::ranges::for_each(m_minor_pentatonic_buttons, fn);
-   fn(m_first_position_button);
+   fn(m_I_position_button);
+   fn(m_II_position_button);
+   fn(m_III_position_button);
+   fn(m_IV_position_button);
+   fn(m_V_position_button);
+   fn(m_VI_position_button);
+   fn(m_VII_position_button);
+   fn(m_VIII_position_button);
+   fn(m_IX_position_button);
+   fn(m_position_go_button);
    fn(m_E_string_button);
    fn(m_A_string_button);
    fn(m_D_string_button);
    fn(m_G_string_button);
    fn(m_B_string_button);
    fn(m_e_string_button);
-   fn(m_go_button);
+   fn(m_string_go_button);
    fn(m_sharps_checkbox);
    fn(m_flats_checkbox);
 }
@@ -228,7 +327,17 @@ void StaffSetup::draw(sf::RenderTarget& target, sf::RenderStates /*states*/) con
       target.draw(button);
    }
 
-   target.draw(m_first_position_button);
+   target.draw(m_position_label);
+   target.draw(m_I_position_button);
+   target.draw(m_II_position_button);
+   target.draw(m_III_position_button);
+   target.draw(m_IV_position_button);
+   target.draw(m_V_position_button);
+   target.draw(m_VI_position_button);
+   target.draw(m_VII_position_button);
+   target.draw(m_VIII_position_button);
+   target.draw(m_IX_position_button);
+   target.draw(m_position_go_button);
    target.draw(m_string_label);
    target.draw(m_E_string_button);
    target.draw(m_A_string_button);
@@ -236,7 +345,7 @@ void StaffSetup::draw(sf::RenderTarget& target, sf::RenderStates /*states*/) con
    target.draw(m_G_string_button);
    target.draw(m_B_string_button);
    target.draw(m_e_string_button);
-   target.draw(m_go_button);
+   target.draw(m_string_go_button);
 
    target.draw(m_sharps_checkbox);
    target.draw(m_flats_checkbox);

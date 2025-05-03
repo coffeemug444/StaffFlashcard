@@ -62,13 +62,8 @@ bool notesAreEnharmonic(Note note1, Note note2);
 std::vector<Note> getAllNotes();
 std::vector<Note> getNotesForKey(Note note, Key key);
 
-std::vector<NoteOctave> noteOctavesForFirstPosition();
-std::vector<NoteOctave> noteOctavesForEString();
-std::vector<NoteOctave> noteOctavesForAString();
-std::vector<NoteOctave> noteOctavesForDString();
-std::vector<NoteOctave> noteOctavesForGString();
-std::vector<NoteOctave> noteOctavesForBString();
-std::vector<NoteOctave> noteOctavesForeString();
+std::vector<NoteOctave> noteOctavesForString(int string);
+std::vector<NoteOctave> noteOctavesForPosition(int position);
 
 std::vector<NoteOctave> notesInOctaves(std::span<const Note> notes, std::span<const int> octaves);
 

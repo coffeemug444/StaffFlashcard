@@ -7,7 +7,6 @@
 #include <map>
 #include <random>
 #include <algorithm>
-#include <cassert>
 
 const int32_t TIMEOUT_MILLISECONDS = 500;
 
