@@ -9,8 +9,8 @@ class AudioSetup : public sf::Drawable
 {
 public:
    AudioSetup(
-      std::function<void(const std::string&)> pick_audio_device,
-      std::function<void(const sf::Vector2f&)> resize_callback);
+      const std::function<void(const std::string&)> &pick_audio_device,
+      const std::function<void(const sf::Vector2f&)> &resize_callback);
 
    void setupButtons();
 

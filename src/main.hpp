@@ -17,7 +17,7 @@ public:
 
    void loop();
 private:
-   enum class Stage {
+   enum class Stage : std::uint8_t {
       AUDIO_SETUP,
       NOTES_SETUP,
       RUNNING
@@ -30,6 +30,12 @@ private:
    void gotoAudioSetup();
    void gotoNotesSetup();
    void gotoRunning(const std::vector<NoteSet>& notes);
+
+   void handleClosed(const sf::Event::Closed &);
+   void handleKeyPressed(const sf::Event::KeyPressed &);
+   void handleMouseMoved(const sf::Event::MouseMoved &);
+   void handleMouseButtonPressed(const sf::Event::MouseButtonPressed &);
+   void handleMouseButtonReleased(const sf::Event::MouseButtonReleased &);
 
    sf::RenderWindow m_window;
    Staff m_staff;

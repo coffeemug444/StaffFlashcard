@@ -12,13 +12,13 @@ class Staff;
 class AudioProcessor : public sf::SoundRecorder
 {
 public:
-   AudioProcessor(std::function<void(int)> on_tone_index_guessed);
-   bool onProcessSamples(const int16_t* samples, std::size_t sampleCount) override;
+   explicit AudioProcessor(std::function<void(int)> on_tone_index_guessed);
+   bool onProcessSamples(const int16_t* samples, std::size_t sample_count) override;
 
-   ~AudioProcessor() { stop(); }
+   ~AudioProcessor() override { stop(); }
 private:
 
-   double goertzelMag(std::span<const double> samples, double frequency);
+   static double goertzelMag(std::span<const double> samples, double frequency);
    static constexpr unsigned SAMPLE_RATE = 44100;
    static constexpr unsigned PROCESSING_SIZE = SAMPLE_RATE / 4;
 

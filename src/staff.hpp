@@ -9,7 +9,7 @@
 class Staff : public sf::Drawable
 {
 public:
-   Staff(float height);
+   explicit Staff(float height);
 
    void setPos(float x, float y);
    void move(float x, float y);
@@ -26,16 +26,16 @@ private:
    void drawCurrentNote();
 
    void setRandomNote();
-   float noteHeight() { return m_height*0.135; };
+   float noteHeight() const { return m_height*0.135; };
 
-   constexpr static inline wchar_t FLAT = L'\U0000266D';          // 𝅝
-   constexpr static inline wchar_t SHARP = L'\U0000266F';         // ♯
-   constexpr static inline wchar_t WHOLE_NOTE = L'\U0001D15D';    // ♭
-   constexpr static inline wchar_t CLEF = L'\U0001D11E';          // 𝄞
-   constexpr static inline wchar_t STAFF = L'\U0001D11A';         // 𝄚
-   constexpr static inline wchar_t STAFF_SINGLE = L'\U0001D116';  // 𝄖
-   constexpr static inline wchar_t STAFF_DOUBLE = L'\U0001D117';  // 𝄗
-   constexpr static inline wchar_t STAFF_TRIPLE = L'\U0001D118';  // 𝄘
+   constexpr static wchar_t FLAT = L'\U0000266D';          // 𝅝
+   constexpr static wchar_t SHARP = L'\U0000266F';         // ♯
+   constexpr static wchar_t WHOLE_NOTE = L'\U0001D15D';    // ♭
+   constexpr static wchar_t CLEF = L'\U0001D11E';          // 𝄞
+   constexpr static wchar_t STAFF = L'\U0001D11A';         // 𝄚
+   constexpr static wchar_t STAFF_SINGLE = L'\U0001D116';  // 𝄖
+   constexpr static wchar_t STAFF_DOUBLE = L'\U0001D117';  // 𝄗
+   constexpr static wchar_t STAFF_TRIPLE = L'\U0001D118';  // 𝄘
 
    std::vector<NoteSet> m_note_sets;
 
@@ -72,5 +72,5 @@ private:
    sf::Clock m_clock;
    int32_t m_timeout;
 
-   static constexpr inline int NUM_LINES = 5;
+   static constexpr int NUM_LINES = 5;
 };

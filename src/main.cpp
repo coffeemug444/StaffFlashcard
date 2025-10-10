@@ -10,7 +10,6 @@
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window/Keyboard.hpp>
-#include <cmath>
 #include <complex>
 #include <functional>
 #include <fstream>
@@ -22,14 +21,18 @@ struct visitor : Callable... {
    using Callable::operator()...;
 };
 
+namespace
+{
 
 template <typename B, typename A>
-static sf::Vector2<B> convertVec(sf::Vector2<A> a)
+sf::Vector2<B> convertVec(const sf::Vector2<A> &vec)
 {
    return sf::Vector2<B> {
-      static_cast<B>(a.x),
-      static_cast<B>(a.y),
+      static_cast<B>(vec.x),
+      static_cast<B>(vec.y),
    };
+}
+
 }
 
 
@@ -38,87 +41,97 @@ void Main::pollEvents()
    while (const std::optional<sf::Event> event = m_window.pollEvent())
    {
       event->visit(visitor{
-         [&](sf::Event::Closed)
-         {
-            m_window.close();
-         },
-         [&](sf::Event::KeyPressed ev)
-         {
-            switch (ev.code)
-            {
-            case sf::Keyboard::Key::Escape:
-               m_window.close();
-               break;
-            case sf::Keyboard::Key::Enter:
-               m_staff.cheat();
-               break;
-            case sf::Keyboard::Key::Backspace:
-               if (m_stage == Stage::RUNNING)
-               {
-                  gotoNotesSetup();
-                  break;
-               }
-               if (m_stage == Stage::NOTES_SETUP)
-               {
-                  gotoAudioSetup();
-                  break;
-               }
-            default: 
-               break;
-            }
-         },
-         [&](sf::Event::MouseMoved ev)
-         {
-            sf::Vector2f pos = convertVec<float>(ev.position);
-            switch(m_stage)
-            {
-               using enum Stage;
-               case AUDIO_SETUP:
-                  m_audio_setup.mouseMoved(pos);
-                  break;
-               case NOTES_SETUP:
-                  m_staff_setup.mouseMoved(pos);
-                  break;
-               case RUNNING:
-                  break;
-            }
-         },
-         [&](sf::Event::MouseButtonPressed ev)
-         {
-            if (ev.button != sf::Mouse::Button::Left) return;
-            sf::Vector2f pos = convertVec<float>(ev.position);
-            switch(m_stage)
-            {
-               using enum Stage;
-               case AUDIO_SETUP:
-                  m_audio_setup.mouseDown(pos);
-                  break;
-               case NOTES_SETUP:
-                  m_staff_setup.mouseDown(pos);
-                  break;
-               case RUNNING:
-                  break;
-            }
-         },
-         [&](sf::Event::MouseButtonReleased ev)
-         {
-            if (ev.button != sf::Mouse::Button::Left) return;
-            sf::Vector2f pos = convertVec<float>(ev.position);
-            switch(m_stage)
-            {
-               using enum Stage;
-               case AUDIO_SETUP:
-                  m_audio_setup.mouseUp(pos);
-                  break;
-               case NOTES_SETUP:
-                  m_staff_setup.mouseUp(pos);
-                  break;
-               case RUNNING:
-                  break;
-            }
-         },
-         [](auto){} // default
+         std::bind_front(&Main::handleClosed,this),
+         std::bind_front(&Main::handleKeyPressed,this),
+         std::bind_front(&Main::handleMouseMoved,this),
+         std::bind_front(&Main::handleMouseButtonPressed,this),
+         std::bind_front(&Main::handleMouseButtonReleased,this),
+         [](auto){}  // default
       });
+   }
+}
+
+void Main::handleClosed(const sf::Event::Closed & /*unused*/)
+{
+   m_window.close();
+}
+void Main::handleKeyPressed(const sf::Event::KeyPressed &event)
+{
+   switch (event.code)
+   {
+   case sf::Keyboard::Key::Escape:
+      m_window.close();
+      break;
+   case sf::Keyboard::Key::Enter:
+      m_staff.cheat();
+      break;
+   case sf::Keyboard::Key::Backspace:
+      if (m_stage == Stage::RUNNING)
+      {
+         gotoNotesSetup();
+         break;
+      }
+      if (m_stage == Stage::NOTES_SETUP)
+      {
+         gotoAudioSetup();
+         break;
+      }
+   default: 
+      break;
+   }
+}
+void Main::handleMouseMoved(const sf::Event::MouseMoved &event)
+{
+   sf::Vector2f pos = convertVec<float>(event.position);
+   switch(m_stage)
+   {
+      using enum Stage;
+      case AUDIO_SETUP:
+         m_audio_setup.mouseMoved(pos);
+         break;
+      case NOTES_SETUP:
+         m_staff_setup.mouseMoved(pos);
+         break;
+      case RUNNING:
+         break;
+   }
+}
+void Main::handleMouseButtonPressed(const sf::Event::MouseButtonPressed &event)
+{
+   if (event.button != sf::Mouse::Button::Left)
+   {
+      return;
+   }
+   sf::Vector2f pos = convertVec<float>(event.position);
+   switch(m_stage)
+   {
+      using enum Stage;
+      case AUDIO_SETUP:
+         m_audio_setup.mouseDown(pos);
+         break;
+      case NOTES_SETUP:
+         m_staff_setup.mouseDown(pos);
+         break;
+      case RUNNING:
+         break;
+   }
+}
+void Main::handleMouseButtonReleased(const sf::Event::MouseButtonReleased &event)
+{
+   if (event.button != sf::Mouse::Button::Left) return;
+   
+   sf::Vector2f pos = convertVec<float>(event.position);
+   switch(m_stage)
+   {
+      using enum Stage;
+      case AUDIO_SETUP:
+         m_audio_setup.mouseUp(pos);
+         break;
+      case NOTES_SETUP:
+         m_staff_setup.mouseUp(pos);
+         break;
+      case RUNNING:
+         break;
    }
 }
 
@@ -156,8 +169,7 @@ void Main::gotoRunning(const std::vector<NoteSet>& notes)
 
 void Main::setWindowSize(const sf::Vector2f& size)
 {
-   auto float_to_unsigned = [](const sf::Vector2f v) { return sf::Vector2u{ static_cast<unsigned>(v.x), static_cast<unsigned>(v.y) }; };
-   m_window.setSize(float_to_unsigned(size));
+   m_window.setSize(convertVec<unsigned>(size));
    m_window.setView(sf::View{sf::FloatRect{{0.f, 0.f}, size}});
 }
 
@@ -165,12 +177,12 @@ void Main::setWindowSize(const sf::Vector2f& size)
 Main::Main()
    :m_window{sf::VideoMode({1, 1}), "Staff flashcard", sf::Style::Default ^ sf::Style::Resize}
    ,m_staff{200}
-   ,m_staff_setup{std::bind(&Main::gotoRunning, this, std::placeholders::_1)}
-   ,m_audio_processor{std::bind(&Staff::guessNote, &m_staff, std::placeholders::_1)}
+   ,m_staff_setup{std::bind_front(&Main::gotoRunning, this)}
+   ,m_audio_processor{std::bind_front(&Staff::guessNote, &m_staff)}
    ,m_stage{Stage::AUDIO_SETUP}
    ,m_audio_setup{
-      std::bind(&Main::pickAudioDevice, this, std::placeholders::_1),
-      std::bind(&Main::setWindowSize, this, std::placeholders::_1)}
+      std::bind_front(&Main::pickAudioDevice, this),
+      std::bind_front(&Main::setWindowSize, this)}
 {
    m_window.setFramerateLimit(144);
 }
@@ -200,8 +212,8 @@ void Main::loop()
 
 int main()
 {
-   Main m{};
-   m.loop();
+   Main main{};
+   main.loop();
 
    return 0;
 }

@@ -1,12 +1,11 @@
 #include "audioProcessor.hpp"
 
-#include <numeric>
+#include <algorithm>
 #include <utility>
 
 
-
 AudioProcessor::AudioProcessor(std::function<void(int)> on_tone_index_guessed)
-   :m_on_tone_index_guessed{on_tone_index_guessed}
+   :m_on_tone_index_guessed{std::move(on_tone_index_guessed)}
 {
 }
 
@@ -36,16 +35,16 @@ bool AudioProcessor::onProcessSamples(const int16_t* samples, std::size_t sample
       double fifth       = goertzelMag(samples_double, (3.f/2.f)*frequency);
       double fourth      = goertzelMag(samples_double, (4.f/3.f)*frequency);
 
-      double total = base + octave + fifth/5 + fourth/7;
+      double total = base + octave + (fifth/5) + (fourth/7);
 
       double adjustment = std::pow(3.0, note/(12.0*5.0)); // makes higher notes easier to detect
 
       bins.push_back(total * adjustment);
    }
 
-   auto best_note = std::max_element(bins.begin(), bins.end());
+   auto best_note = std::ranges::max_element(bins);
    
-   if (*best_note < 400) return true;
+   if (*best_note < 600) return true;
 
    int tone_index = std::distance(bins.begin(), best_note) % 12;
 
@@ -63,16 +62,16 @@ double AudioProcessor::goertzelMag(std::span<const double> samples, double frequ
    double coeff = 2.0 * cosine;
 
    using Q = std::pair<double,double>;
-   Q q = std::accumulate(samples.begin(), samples.end(), Q{0,0}, [&](const Q& q, double sample) {
+   Q q = std::ranges::fold_left(samples, Q{0,0}, [&](const Q& q, double sample) {
       return Q { 
-         coeff * q.first - q.second + sample, 
+         (coeff * q.first) - q.second + sample, 
          q.first 
       };
    });
 
    // calculate the real and imaginary results
    // scaling appropriately
-   double real = q.first - q.second * cosine;
+   double real = q.first - (q.second * cosine);
    double imag = q.second * sine;
    double x = 8.0/(samples.size()*samples.size());
 

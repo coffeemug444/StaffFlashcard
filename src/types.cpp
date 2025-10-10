@@ -56,25 +56,25 @@ int mapNoteToToneIndex(NoteOctave note_octave)
    {
       using enum Note;
       case A : return 0;
-      case As: return 1;
+      case As:
       case Bb: return 1;
       case B : return 2;
       case Bs: return 3;
       case Cb: return 2;
       case C : return 3;
-      case Cs: return 4;
+      case Cs:
       case Db: return 4;
       case D : return 5;
-      case Ds: return 6;
+      case Ds:
       case Eb: return 6;
       case E : return 7;
       case Es: return 8;
       case Fb: return 7;
       case F : return 8;
-      case Fs: return 9;
+      case Fs:
       case Gb: return 9;
       case G : return 10;
-      case Gs: return 11;
+      case Gs:
       case Ab: return 11;
    }
    std::unreachable();
@@ -82,14 +82,13 @@ int mapNoteToToneIndex(NoteOctave note_octave)
 
 NoteModifier getModifier(Note note)
 {
-   int note_as_num = static_cast<int>(note);
-   switch (note_as_num % 3)
+   switch (static_cast<int>(note) % 3)
    {
    case 0: return NoteModifier::FLAT;
    case 1: return NoteModifier::NATURAL;
    case 2: return NoteModifier::SHARP;
+   default: std::unreachable();
    }
-   std::unreachable();
 }
 
 bool notesAreEnharmonic(Note note1, Note note2)
@@ -135,6 +134,9 @@ std::vector<NoteOctave> notesInOctaves(std::span<const Note> notes, std::span<co
    return out;
 }
 
+namespace 
+{
+
 std::vector<NoteOctave> noteOctavesForFretPosition(int string, int fret)
 {
    int note = fret;
@@ -171,6 +173,8 @@ std::vector<NoteOctave> noteOctavesForFretPosition(int string, int fret)
    case 11: return {{Ds, octave}, {Eb, octave+1}};
    default: assert(false);
    }
+}
+
 }
 
 

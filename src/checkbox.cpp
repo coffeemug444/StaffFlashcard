@@ -55,13 +55,13 @@ void Checkbox::mouseUp(const sf::Vector2f& pos)
 {
    if (not m_pressing) return;
 
-   m_pressed ^= m_pressing and hovering(pos);
+   m_pressed = m_pressed != m_pressing and hovering(pos);
    m_pressing = false;
 
    m_box.setFillColor(m_pressed ? HOVER_PRESSED_COLOR : HOVER_COLOR);
 }
 
-void Checkbox::draw(sf::RenderTarget& target, sf::RenderStates) const
+void Checkbox::draw(sf::RenderTarget& target, sf::RenderStates /*states*/) const
 {
    target.draw(m_box);
    target.draw(m_text);

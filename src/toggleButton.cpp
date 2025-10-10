@@ -55,13 +55,13 @@ void ToggleButton::mouseUp(const sf::Vector2f& pos)
 {
    if (not m_pressing) return;
 
-   m_pressed ^= m_pressing and hovering(pos);
+   m_pressed = m_pressed != m_pressing and hovering(pos);
    m_pressing = false;
 
    m_background.setFillColor(m_pressed ? HOVER_PRESSED_COLOR : HOVER_COLOR);
 }
 
-void ToggleButton::draw(sf::RenderTarget& target, sf::RenderStates) const
+void ToggleButton::draw(sf::RenderTarget& target, sf::RenderStates /*states*/) const
 {
    target.draw(m_background);
    target.draw(m_text);

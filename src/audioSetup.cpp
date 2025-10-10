@@ -5,25 +5,29 @@
 #include <fstream>
 #include <algorithm>
 
+namespace
+{
 
-static std::vector<Button> getButtons(const std::vector<std::string>& devices, std::function<void(const std::string&)> pick_audio_device)
+std::vector<Button> getButtons(const std::vector<std::string>& devices, const std::function<void(const std::string&)>& pick_audio_device)
 {  
    std::vector<Button> buttons;
+   buttons.reserve(devices.size());
    for (const std::string& device : devices)
    {
-      buttons.push_back(Button{device, std::bind(pick_audio_device, device)});
+      buttons.emplace_back(device, std::bind_front(pick_audio_device, device));
    }
 
    return buttons;
 }
 
+}
+
 
 AudioSetup::AudioSetup(
-      std::function<void(const std::string&)> pick_audio_device,
-      std::function<void(const sf::Vector2f&)> resize_callback)
+      const std::function<void(const std::string&)> &pick_audio_device,
+      const std::function<void(const sf::Vector2f&)> &resize_callback)
    : m_pick_audio_device_callback{pick_audio_device}
    , m_resize_callback_callback{resize_callback}
-   , m_buttons{}
 {
    std::string line;
    {
@@ -52,7 +56,7 @@ void AudioSetup::setupButtons()
       longest = std::max(longest, button.getSize().x);
    }
 
-   m_resize_callback_callback({longest + 10.f,50.f*m_buttons.size() - 10.f});
+   m_resize_callback_callback({longest + 10.f,(50.f*m_buttons.size()) - 10.f});
 }
 
 void AudioSetup::mouseMoved(const sf::Vector2f& pos)
@@ -79,7 +83,7 @@ void AudioSetup::mouseUp(const sf::Vector2f& pos)
    }
 }
 
-void AudioSetup::draw(sf::RenderTarget& target, sf::RenderStates) const
+void AudioSetup::draw(sf::RenderTarget& target, sf::RenderStates /*states*/) const
 {
    for (const Button& button : m_buttons)
    {

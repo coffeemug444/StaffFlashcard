@@ -5,6 +5,7 @@
 class Pressable
 {
 public:
+   virtual ~Pressable() = default;
    virtual void mouseMoved(const sf::Vector2f& pos) = 0;
    virtual void mouseDown(const sf::Vector2f& pos) = 0;
    virtual void mouseUp(const sf::Vector2f& pos) = 0;

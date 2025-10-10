@@ -8,7 +8,7 @@
 class Button : public sf::Drawable, public Pressable
 {
 public:
-    Button(const std::string& text, std::function<void()> on_click, sf::Vector2f size = {});
+    Button(const std::string& text, const std::function<void()> &on_click, sf::Vector2f size = {});
 
     void setPosition(const sf::Vector2f& pos);
     void move(const sf::Vector2f& diff);
@@ -27,7 +27,7 @@ private:
     std::function<void()> m_on_click;
 
     const static inline sf::Color STANDARD_COLOR = sf::Color::Blue;
-    const static inline sf::Color HOVER_COLOR = sf::Color(100, 100, 255);
+    const static inline sf::Color HOVER_COLOR = sf::Color{100, 100, 255};
     const static inline sf::Color PRESS_COLOR = sf::Color::Magenta;
 
     bool m_pressing;

@@ -10,7 +10,7 @@
 class StaffSetup : public sf::Drawable
 {
 public:
-   StaffSetup(std::function<void(const std::vector<NoteSet>&)> pick_notes);
+   explicit StaffSetup(const std::function<void(const std::vector<NoteSet>&)> &pick_notes);
 
    void mouseMoved(const sf::Vector2f& pos);
    void mouseDown(const sf::Vector2f& pos);

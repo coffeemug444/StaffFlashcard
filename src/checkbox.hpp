@@ -6,7 +6,7 @@
 class Checkbox : public sf::Drawable, public Pressable
 {
 public:
-   Checkbox(const std::string& text);
+   explicit Checkbox(const std::string& text);
 
    bool checked() const;
 

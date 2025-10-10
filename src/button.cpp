@@ -3,7 +3,7 @@
 #include <SFML/System/Vector2.hpp>
 
 
-Button::Button(const std::string& text, std::function<void()> on_click, sf::Vector2f size)
+Button::Button(const std::string& text, const std::function<void()> &on_click, sf::Vector2f size)
     :m_text{FONT, text} // size??
     ,m_background{size != sf::Vector2f{} ? size : sf::Vector2f{m_text.getGlobalBounds().size.x + 5.f, 40.f}}
     ,m_on_click{on_click}

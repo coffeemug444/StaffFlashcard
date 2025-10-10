@@ -6,7 +6,7 @@
 class ToggleButton : public sf::Drawable, public Pressable
 {
 public:
-   ToggleButton(const std::string& text, sf::Vector2f size = {});
+   explicit ToggleButton(const std::string& text, sf::Vector2f size = {});
 
    bool checked() const;
 

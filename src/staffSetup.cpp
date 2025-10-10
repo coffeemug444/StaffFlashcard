@@ -1,25 +1,36 @@
 #include "staffSetup.hpp"
+
+#include "constants.hpp"
 #include "pressable.hpp"
 #include "types.hpp"
+
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Text.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <algorithm>
 #include <ranges>
-#include <algorithm>
-#include "constants.hpp"
 
 constexpr std::array ALL_OCTAVES = std::to_array({0,1,2,3});
 
-static std::vector<NoteSet> getNoteSet(Note note, Key key, std::span<const int> octaves, std::string_view name)
+namespace
 {
-   return {NoteSet{notesInOctaves(getNotesForKey(note, key), octaves), std::string{name}}};
+
+std::vector<NoteSet> getNoteSet(Note note, Key key, std::span<const int> octaves, std::string_view name)
+{
+   return {
+      NoteSet {
+         .notes=notesInOctaves(getNotesForKey(note, key), octaves), 
+         .name=std::string{name}
+      }
+   };
+}
+
 }
 
 constexpr sf::Vector2f POS_SIZE = {55.f, 40.f};
 
-StaffSetup::StaffSetup(std::function<void(const std::vector<NoteSet>&)> pick_notes)
+StaffSetup::StaffSetup(const std::function<void(const std::vector<NoteSet>&)> &pick_notes)
    :m_pick_notes{pick_notes}
    ,m_major_buttons{
       {"C major", std::bind(m_pick_notes, getNoteSet(Note::C, Key::MAJOR, ALL_OCTAVES, "C major")), {100.f, 40.f}},
@@ -94,28 +105,28 @@ StaffSetup::StaffSetup(std::function<void(const std::vector<NoteSet>&)> pick_not
    }
 
    m_position_label.move({0.f,m_major_buttons.size()*50.f});
-   m_I_position_button.move({   120.f + 0*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 0*(POS_SIZE.y + 10.f)});
-   m_II_position_button.move({  120.f + 1*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 0*(POS_SIZE.y + 10.f)});
-   m_III_position_button.move({ 120.f + 2*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 0*(POS_SIZE.y + 10.f)});
+   m_I_position_button.move({   120.f + (0*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (0*(POS_SIZE.y + 10.f))});
+   m_II_position_button.move({  120.f + (1*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (0*(POS_SIZE.y + 10.f))});
+   m_III_position_button.move({ 120.f + (2*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (0*(POS_SIZE.y + 10.f))});
    
-   m_IV_position_button.move({  120.f + 0*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 1*(POS_SIZE.y + 10.f)});
-   m_V_position_button.move({   120.f + 1*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 1*(POS_SIZE.y + 10.f)});
-   m_VI_position_button.move({  120.f + 2*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 1*(POS_SIZE.y + 10.f)});
+   m_IV_position_button.move({  120.f + (0*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (1*(POS_SIZE.y + 10.f))});
+   m_V_position_button.move({   120.f + (1*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (1*(POS_SIZE.y + 10.f))});
+   m_VI_position_button.move({  120.f + (2*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (1*(POS_SIZE.y + 10.f))});
    
-   m_VII_position_button.move({ 120.f + 0*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 2*(POS_SIZE.y + 10.f)});
-   m_VIII_position_button.move({120.f + 1*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 2*(POS_SIZE.y + 10.f)});
-   m_IX_position_button.move({  120.f + 2*(POS_SIZE.x + 10.f),m_major_buttons.size()*50.f + 2*(POS_SIZE.y + 10.f)});
+   m_VII_position_button.move({ 120.f + (0*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (2*(POS_SIZE.y + 10.f))});
+   m_VIII_position_button.move({120.f + (1*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (2*(POS_SIZE.y + 10.f))});
+   m_IX_position_button.move({  120.f + (2*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (2*(POS_SIZE.y + 10.f))});
 
-   m_position_go_button.move({120.f + 6*50.f,m_major_buttons.size()*50.f + 1*(POS_SIZE.y + 10.f)});
+   m_position_go_button.move({120.f + (6*50.f),(m_major_buttons.size()*50.f) + (1*(POS_SIZE.y + 10.f))});
 
-   m_string_label.move({0.f,m_major_buttons.size()*50.f + 3*(POS_SIZE.y + 10.f)});
-   m_E_string_button.move({120.f + 0*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
-   m_A_string_button.move({120.f + 1*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
-   m_D_string_button.move({120.f + 2*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
-   m_G_string_button.move({120.f + 3*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
-   m_B_string_button.move({120.f + 4*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
-   m_e_string_button.move({120.f + 5*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
-   m_string_go_button.move({120.f + 6*50.f,m_major_buttons.size()*50 + 3*(POS_SIZE.y + 10.f)});
+   m_string_label.move(   {0.f,              (m_major_buttons.size()*50) + (3*(POS_SIZE.y + 10.f))});
+   m_E_string_button.move({120.f  + (0*50.f),(m_major_buttons.size()*50) + (3*(POS_SIZE.y + 10.f))});
+   m_A_string_button.move({120.f  + (1*50.f),(m_major_buttons.size()*50) + (3*(POS_SIZE.y + 10.f))});
+   m_D_string_button.move({120.f  + (2*50.f),(m_major_buttons.size()*50) + (3*(POS_SIZE.y + 10.f))});
+   m_G_string_button.move({120.f  + (3*50.f),(m_major_buttons.size()*50) + (3*(POS_SIZE.y + 10.f))});
+   m_B_string_button.move({120.f  + (4*50.f),(m_major_buttons.size()*50) + (3*(POS_SIZE.y + 10.f))});
+   m_e_string_button.move({120.f  + (5*50.f),(m_major_buttons.size()*50) + (3*(POS_SIZE.y + 10.f))});
+   m_string_go_button.move({120.f + (6*50.f),(m_major_buttons.size()*50) + (3*(POS_SIZE.y + 10.f))});
 
    m_sharps_checkbox.move({550.f,m_major_buttons.size()*50.f});
    m_flats_checkbox.move({550.f,(m_major_buttons.size()+1)*50.f});
