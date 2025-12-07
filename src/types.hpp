@@ -2,9 +2,9 @@
 
 #include <utility>
 #include <vector>
-#include <iosfwd>
 #include <span>
 #include <string>
+#include <format>
 
 enum class Note
 {
@@ -31,6 +31,48 @@ enum class Note
    Gs
 };
 
+template<>
+struct std::formatter<Note>
+{
+   constexpr auto parse(std::format_parse_context& ctx) 
+   {
+      return ctx.begin();
+   }
+
+   constexpr auto format(const Note& obj, std::format_context& ctx) const 
+   {
+      std::string_view str = [&](){
+         switch(obj){
+         using enum Note;
+         case Ab: return "Ab";
+         case  A: return "A";
+         case As: return "A#";
+         case Bb: return "Bb";
+         case  B: return "B";
+         case Bs: return "B#";
+         case Cb: return "Cb";
+         case  C: return "C";
+         case Cs: return "C#";
+         case Db: return "Db";
+         case  D: return "D";
+         case Ds: return "D#";
+         case Eb: return "Eb";
+         case  E: return "E";
+         case Es: return "E#";
+         case Fb: return "Fb";
+         case  F: return "F";
+         case Fs: return "F#";
+         case Gb: return "Gb";
+         case  G: return "G";
+         case Gs: return "G#";
+         default: std::unreachable();
+         }
+      }();
+      return std::format_to(ctx.out(), "{}", str);
+   }
+};
+
+
 enum class Key
 {
    MAJOR,
@@ -53,6 +95,7 @@ struct NoteSet {
    std::string name;
 };
 
+Note mapIndexToNote(int index);
 int mapNoteToToneIndex(NoteOctave note_octave);
 int mapNoteToStaffIndex(NoteOctave note_octave);
 NoteModifier getModifier(Note note);
@@ -66,5 +109,3 @@ std::vector<NoteOctave> noteOctavesForString(int string);
 std::vector<NoteOctave> noteOctavesForPosition(int position);
 
 std::vector<NoteOctave> notesInOctaves(std::span<const Note> notes, std::span<const int> octaves);
-
-std::ostream & operator<<(std::ostream &out, Note note);

@@ -138,7 +138,6 @@ void Main::handleMouseButtonReleased(const sf::Event::MouseButtonReleased &event
 void Main::pickAudioDevice(const std::string& device_name)
 {
    assert(m_audio_processor.setDevice(device_name));
-   assert(m_audio_processor.start());
 
    std::ofstream file("saved_device.dat");
    assert(file);
@@ -163,6 +162,7 @@ void Main::gotoNotesSetup()
 void Main::gotoRunning(const std::vector<NoteSet>& notes)
 {
    setWindowSize({270, 510});
+   assert(m_audio_processor.start());
    m_staff.setNotes(notes);
    m_stage = Stage::RUNNING;
 }

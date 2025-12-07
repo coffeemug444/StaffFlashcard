@@ -2,7 +2,28 @@
 
 #include <algorithm>
 #include <utility>
+#include <ranges>
+#include <map>
 
+// #define DEBUG
+
+#ifdef DEBUG
+#include <print>
+#include "types.hpp"
+#endif
+
+
+template <typename T>
+struct Caster_t {
+   template <typename U>
+   auto operator()(U&& x) const
+   {
+      return static_cast<T>(std::forward<U>(x));
+   }
+};
+
+template <typename T>
+static constexpr Caster_t<T> caster{};
 
 AudioProcessor::AudioProcessor(std::function<void(int)> on_tone_index_guessed)
    :m_on_tone_index_guessed{std::move(on_tone_index_guessed)}
@@ -19,34 +40,41 @@ bool AudioProcessor::onProcessSamples(const int16_t* samples, std::size_t sample
    std::vector<double> samples_double;
    samples_double.reserve(sample_count);
 
-   std::transform(begin(m_buffer), next(begin(m_buffer), PROCESSING_SIZE), std::back_inserter(samples_double), [](int16_t sample) { return static_cast<double>(sample); });
+   std::ranges::transform(m_buffer | std::views::take(PROCESSING_SIZE), std::back_inserter(samples_double), caster<double>);
 
    m_buffer.erase(begin(m_buffer), next(begin(m_buffer), PROCESSING_SIZE));
 
    double lowest_frequency = 55.0; // equivalent of A1
-   std::vector<double> bins {};
+   std::array<double, 12> bins{};
 
    for (int note = 0; note < 12*5; note++)
    {
       double frequency = lowest_frequency*std::pow(2.0, note/12.0);
       // 5 octaves of notes
-      double base        = goertzelMag(samples_double,           frequency);
-      double octave      = goertzelMag(samples_double,         2*frequency);
-      double fifth       = goertzelMag(samples_double, (3.f/2.f)*frequency);
-      double fourth      = goertzelMag(samples_double, (4.f/3.f)*frequency);
+      double base          = goertzelMag(samples_double, 1*frequency);
+      double octave        = goertzelMag(samples_double, 2*frequency);
+      double harm1         = goertzelMag(samples_double, 3*frequency);
+      double double_octave = goertzelMag(samples_double, 4*frequency);
+      double harm2         = goertzelMag(samples_double, 5*frequency);
 
-      double total = base + octave + (fifth/5) + (fourth/7);
+      double total = base + octave + double_octave + harm1 + harm2;
 
-      double adjustment = std::pow(3.0, note/(12.0*5.0)); // makes higher notes easier to detect
-
-      bins.push_back(total * adjustment);
+      int bin_index = note % 12;
+      bins.at(bin_index) += total;
    }
 
-   auto best_note = std::ranges::max_element(bins);
-   
-   if (*best_note < 600) return true;
+   auto best_note = std::ranges::max_element(bins, {});
+   int best_power = *best_note;
+   int tone_index = std::ranges::distance(begin(bins), best_note);
+   std::ranges::nth_element(bins, std::next(end(bins), -2), {});
+   double second_best_power = *(std::next(end(bins), -2));
+   double ratio = best_power / second_best_power;
 
-   int tone_index = std::distance(bins.begin(), best_note) % 12;
+   #ifdef DEBUG
+   std::println("Best note: {}, power: {}, ratio: {}", mapIndexToNote(tone_index), best_power, ratio);
+   #endif
+   
+   if (best_power < 50.0 or ratio < 1.1) return true;
 
    m_on_tone_index_guessed(tone_index);
 

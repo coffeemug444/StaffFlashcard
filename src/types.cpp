@@ -2,7 +2,6 @@
 
 #include <stdexcept>
 #include <utility>
-#include <ostream>
 #include <ranges>
 #include <cassert>
 
@@ -47,6 +46,26 @@ int mapNoteToStaffIndex(NoteOctave note_octave)
    std::unreachable();
 }
 
+Note mapIndexToNote(int index)
+{
+   switch(index)
+   {
+   using enum Note;
+   case  0: return A;
+   case  1: return As;
+   case  2: return B;
+   case  3: return C;
+   case  4: return Cs;
+   case  5: return D;
+   case  6: return Ds;
+   case  7: return E;
+   case  8: return F;
+   case  9: return Fs;
+   case 10: return G;
+   case 11: return Gs;
+   default: std::unreachable();
+   }
+}
 
 int mapNoteToToneIndex(NoteOctave note_octave)
 {
@@ -204,11 +223,11 @@ std::vector<NoteOctave> noteOctavesForPosition(int position)
    if (position == 1)
    {
       // add open strings
-      notes.push_back({E, 0});
-      notes.push_back({A, 0});
-      notes.push_back({D, 0});
-      notes.push_back({G, 1});
-      notes.push_back({E, 2});
+      notes.emplace_back(E, 0);
+      notes.emplace_back(A, 0);
+      notes.emplace_back(D, 0);
+      notes.emplace_back(G, 1);
+      notes.emplace_back(E, 2);
    }
 
    return notes;
@@ -338,34 +357,4 @@ std::vector<Note> getNotesForKey(Note note, Key key)
    }
    }
    std::unreachable();
-}
-
-std::ostream & operator<<(std::ostream &out, Note note)
-{
-   using enum Note;
-   switch (note)
-   {
-   case Ab: return out << "Ab";
-   case A : return out << "A" ;
-   case As: return out << "As";
-   case Bb: return out << "Bb";
-   case B : return out << "B" ;
-   case Bs: return out << "Bs";
-   case Cb: return out << "Cb";
-   case C : return out << "C" ;
-   case Cs: return out << "Cs";
-   case Db: return out << "Db";
-   case D : return out << "D" ;
-   case Ds: return out << "Ds";
-   case Eb: return out << "Eb";
-   case E : return out << "E" ;
-   case Es: return out << "Es";
-   case Fb: return out << "Fb";
-   case F : return out << "F" ;
-   case Fs: return out << "Fs";
-   case Gb: return out << "Gb";
-   case G : return out << "G" ;
-   case Gs: return out << "Gs";
-   }
-   return out;
 }
