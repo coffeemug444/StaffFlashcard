@@ -8,7 +8,8 @@
 // #define DEBUG
 
 #ifdef DEBUG
-#include <print>
+#include <fmt/core.h>
+#include <fmt/color.h>
 #include "types.hpp"
 #endif
 
@@ -51,30 +52,35 @@ bool AudioProcessor::onProcessSamples(const int16_t* samples, std::size_t sample
    {
       double frequency = lowest_frequency*std::pow(2.0, note/12.0);
       // 5 octaves of notes
+      double sub_harm2     = goertzelMag(samples_double, (1/5.0)*frequency);
+      double sub_harm1     = goertzelMag(samples_double, (1/3.0)*frequency);
       double base          = goertzelMag(samples_double, 1*frequency);
       double octave        = goertzelMag(samples_double, 2*frequency);
       double harm1         = goertzelMag(samples_double, 3*frequency);
       double double_octave = goertzelMag(samples_double, 4*frequency);
       double harm2         = goertzelMag(samples_double, 5*frequency);
 
-      double total = base + octave + double_octave + harm1 + harm2;
+      double total = base + octave + double_octave + harm1 + harm2 - sub_harm1 - sub_harm2;
 
       int bin_index = note % 12;
       bins.at(bin_index) += total;
    }
 
-   auto best_note = std::ranges::max_element(bins, {});
+   auto best_note = std::ranges::max_element(bins);
    int best_power = *best_note;
    int tone_index = std::ranges::distance(begin(bins), best_note);
    std::ranges::nth_element(bins, std::next(end(bins), -2), {});
    double second_best_power = *(std::next(end(bins), -2));
    double ratio = best_power / second_best_power;
 
-   #ifdef DEBUG
-   std::println("Best note: {}, power: {}, ratio: {}", mapIndexToNote(tone_index), best_power, ratio);
-   #endif
    
-   if (best_power < 50.0 or ratio < 1.1) return true;
+   #ifdef DEBUG
+   bool note_is_checkable = best_power > 1000.0 and ratio > 1.1;
+   fmt::color print_color = note_is_checkable ? fmt::color::green : fmt::color::red;
+   fmt::print(fmt::fg(print_color), "Best note: {}, power: {}, ratio: {:.2f}\n", mapIndexToNote(tone_index), best_power, ratio);
+   #endif
+
+   if (best_power < 1000.0 or ratio < 1.1) return true;
 
    m_on_tone_index_guessed(tone_index);
 

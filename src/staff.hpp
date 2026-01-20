@@ -72,5 +72,7 @@ private:
    sf::Clock m_clock;
    int32_t m_timeout;
 
+   int m_correct_sequential_guesses;
+
    static constexpr int NUM_LINES = 5;
 };

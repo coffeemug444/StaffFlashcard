@@ -31,47 +31,37 @@ enum class Note
    Gs
 };
 
-template<>
-struct std::formatter<Note>
-{
-   constexpr auto parse(std::format_parse_context& ctx) 
-   {
-      return ctx.begin();
-   }
 
-   constexpr auto format(const Note& obj, std::format_context& ctx) const 
-   {
-      std::string_view str = [&](){
-         switch(obj){
-         using enum Note;
-         case Ab: return "Ab";
-         case  A: return "A";
-         case As: return "A#";
-         case Bb: return "Bb";
-         case  B: return "B";
-         case Bs: return "B#";
-         case Cb: return "Cb";
-         case  C: return "C";
-         case Cs: return "C#";
-         case Db: return "Db";
-         case  D: return "D";
-         case Ds: return "D#";
-         case Eb: return "Eb";
-         case  E: return "E";
-         case Es: return "E#";
-         case Fb: return "Fb";
-         case  F: return "F";
-         case Fs: return "F#";
-         case Gb: return "Gb";
-         case  G: return "G";
-         case Gs: return "G#";
-         default: std::unreachable();
-         }
-      }();
-      return std::format_to(ctx.out(), "{}", str);
-   }
-};
-
+inline std::string format_as(const Note& note) {
+   std::string_view str = [&](){
+      switch(note){
+      using enum Note;
+      case Ab: return "Ab";
+      case  A: return "A";
+      case As: return "A#";
+      case Bb: return "Bb";
+      case  B: return "B";
+      case Bs: return "B#";
+      case Cb: return "Cb";
+      case  C: return "C";
+      case Cs: return "C#";
+      case Db: return "Db";
+      case  D: return "D";
+      case Ds: return "D#";
+      case Eb: return "Eb";
+      case  E: return "E";
+      case Es: return "E#";
+      case Fb: return "Fb";
+      case  F: return "F";
+      case Fs: return "F#";
+      case Gb: return "Gb";
+      case  G: return "G";
+      case Gs: return "G#";
+      default: std::unreachable();
+      }
+   }();
+   return std::string{str};
+}
 
 enum class Key
 {

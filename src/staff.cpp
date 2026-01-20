@@ -37,6 +37,7 @@ Staff::Staff(float height)
    , m_display_note{false}
    , m_clock{}
    , m_timeout{m_clock.getElapsedTime().asMilliseconds()}
+   , m_correct_sequential_guesses{}
 {
    m_cleff.setPosition({height*.8f,HEIGHT_OFFSET + (height*.35f)}); // lol
 
@@ -163,7 +164,16 @@ void Staff::guessNote(int tone_index)
 
    if (tone_index == mapNoteToToneIndex(m_current_note))
    {
-      setRandomNote();
+      ++m_correct_sequential_guesses;
+      if (m_correct_sequential_guesses >= 3)
+      {
+         setRandomNote();
+         m_correct_sequential_guesses = 0;
+      }
+   }
+   else
+   {
+      m_correct_sequential_guesses = 0;
    }
 }
 

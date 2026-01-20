@@ -19,6 +19,16 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
+
+FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+    GIT_TAG        12.1.0 
+    GIT_SHALLOW ON
+    EXCLUDE_FROM_ALL
+)
+FetchContent_MakeAvailable(fmt)
+
 add_compile_options(-Wall -Wextra -Wpedantic -pg)
 
 add_executable(StaffFlashcard 
@@ -33,6 +43,7 @@ add_executable(StaffFlashcard
     src/audioProcessor.cpp)
 
 target_link_libraries(StaffFlashcard PRIVATE SFML::Graphics SFML::Window SFML::System SFML::Audio)
+target_link_libraries(StaffFlashcard PRIVATE fmt::fmt)
 
 target_include_directories(StaffFlashcard PRIVATE ${CMAKE_SOURCE_DIR}/src)
 
