@@ -94,7 +94,7 @@ void Staff::drawCurrentNote()
    float x = m_position.x + (m_height*0.4);
    float y = HEIGHT_OFFSET + m_position.y + m_y1 - ((position*m_note_height)/2) + (m_height*.8);
 
-   switch(getModifier(m_current_note.first))
+   switch(getModifier(m_current_note.note))
    {
    case NoteModifier::FLAT:
       m_modifier.setString(std::wstring{FLAT});
@@ -147,7 +147,31 @@ void Staff::setRandomNote()
 
       if (mapNoteToStaffIndex(m_current_note) > 21) continue;  // off the staff
       if (std::ranges::contains(prev_notes, m_current_note)) continue;  // too recent
-      if (notesAreEnharmonic(m_current_note.first, last_note.first)) continue;
+      if (notesAreEnharmonic(m_current_note.note, last_note.note)) continue;
+
+      auto position = [&]() -> std::optional<int> {
+         if (note_set.name == "I")   return 1;
+         if (note_set.name == "II")  return 2;
+         if (note_set.name == "III") return 3;
+         if (note_set.name == "IV")  return 4;
+         if (note_set.name == "V")   return 5;
+         if (note_set.name == "VI")  return 6;
+         if (note_set.name == "VII") return 7;
+         if (note_set.name == "IIX") return 8;
+         if (note_set.name == "IX")  return 9;
+         return std::nullopt;
+      }();
+
+      if (position.has_value())
+      {
+         int last_fret = fretOfNote(last_note, *position);
+         int current_fret = fretOfNote(m_current_note, *position);
+         if (last_fret == current_fret)
+         {
+            // don't have two notes on the same fret in a row
+            continue;
+         }
+      }
 
       break;
    }
@@ -162,7 +186,7 @@ void Staff::guessNote(int tone_index)
 {
    if (m_timeout > m_clock.getElapsedTime().asMilliseconds()) return;
 
-   if (tone_index == mapNoteToToneIndex(m_current_note))
+   if (tone_index == toneIndex(m_current_note.note))
    {
       ++m_correct_sequential_guesses;
       if (m_correct_sequential_guesses >= 3)
@@ -179,7 +203,7 @@ void Staff::guessNote(int tone_index)
 
 void Staff::cheat()
 {
-   guessNote(mapNoteToToneIndex(m_current_note));
+   guessNote(toneIndex(m_current_note.note));
 }
 
 void Staff::draw(sf::RenderTarget& target, sf::RenderStates /*states*/) const

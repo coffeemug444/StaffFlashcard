@@ -67,10 +67,8 @@ Note mapIndexToNote(int index)
    }
 }
 
-int mapNoteToToneIndex(NoteOctave note_octave)
+int toneIndex(Note note)
 {
-   auto [note, octave] = note_octave;
-
    switch (note)
    {
       using enum Note;
@@ -99,6 +97,12 @@ int mapNoteToToneIndex(NoteOctave note_octave)
    std::unreachable();
 }
 
+int noteOctaveIndex(NoteOctave note_octave)
+{
+   const auto& [note, octave] = note_octave;
+   return ((toneIndex(note) + 5) % 12) + (12*octave);
+}
+
 NoteModifier getModifier(Note note)
 {
    switch (static_cast<int>(note) % 3)
@@ -112,34 +116,51 @@ NoteModifier getModifier(Note note)
 
 bool notesAreEnharmonic(Note note1, Note note2)
 {
-   if (note1 == note2) return true;
-   switch (note1)
-   {
+   return toneIndex(note1) == toneIndex(note2);
+}
+
+int fretOfNote(NoteOctave note, int position)
+{
    using enum Note;
-   case Ab: return note2 == Gs;
-   case A:  return false;
-   case As: return note2 == Bb;
-   case Bb: return note2 == As;
-   case B:  return note2 == Cb;
-   case Bs: return note2 == C;
-   case Cb: return note2 == B;
-   case C:  return note2 == Bs;
-   case Cs: return note2 == Db;
-   case Db: return note2 == Cs;
-   case D:  return false;
-   case Ds: return note2 == Eb;
-   case Eb: return note2 == Ds;
-   case E:  return note2 == Fb;
-   case Es: return note2 == F;
-   case Fb: return note2 == E;
-   case F:  return note2 == Es;
-   case Fs: return note2 == Gb;
-   case Gb: return note2 == Fs;
-   case G:  return false;
-   case Gs: return note2 == Ab;
+
+   
+   int note_index = noteOctaveIndex(note);
+
+   int E_string = noteOctaveIndex({Note::E, 0});
+   int A_string = noteOctaveIndex({Note::A, 0});
+   int D_string = noteOctaveIndex({Note::D, 0});
+   int G_string = noteOctaveIndex({Note::G, 1});
+   int B_string = noteOctaveIndex({Note::B, 1});
+   int e_string = noteOctaveIndex({Note::E, 2});
+
+   if (position == 1)
+   {
+      if (
+         E_string == note_index or
+         A_string == note_index or
+         D_string == note_index or
+         G_string == note_index or
+         B_string == note_index or
+         e_string == note_index)
+      {
+         return 0;
+      } 
    }
 
-   return false;
+   for (int fret = position; fret < position + 4; ++fret)
+   {
+      if (
+         (E_string + fret) == note_index or
+         (A_string + fret) == note_index or
+         (D_string + fret) == note_index or
+         (G_string + fret) == note_index or
+         (B_string + fret) == note_index or
+         (e_string + fret) == note_index)
+      {
+         return fret;
+      } 
+   }
+   return -1;
 }
 
 std::vector<NoteOctave> notesInOctaves(std::span<const Note> notes, std::span<const int> octaves)
@@ -227,6 +248,7 @@ std::vector<NoteOctave> noteOctavesForPosition(int position)
       notes.emplace_back(A, 0);
       notes.emplace_back(D, 0);
       notes.emplace_back(G, 1);
+      notes.emplace_back(B, 1);
       notes.emplace_back(E, 2);
    }
 

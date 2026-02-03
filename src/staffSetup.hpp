@@ -44,7 +44,7 @@ private:
    ToggleButton m_V_position_button;
    ToggleButton m_VI_position_button;
    ToggleButton m_VII_position_button;
-   ToggleButton m_VIII_position_button;
+   ToggleButton m_IIX_position_button;
    ToggleButton m_IX_position_button;
 
    Button m_position_go_button;

@@ -44,6 +44,14 @@ bool AudioProcessor::onProcessSamples(const int16_t* samples, std::size_t sample
    std::ranges::transform(m_buffer | std::views::take(PROCESSING_SIZE), std::back_inserter(samples_double), caster<double>);
 
    m_buffer.erase(begin(m_buffer), next(begin(m_buffer), PROCESSING_SIZE));
+   auto total_power = std::ranges::fold_left(samples_double, 0.0, [](double accumulator, double x) { return accumulator += x*x; }) / PROCESSING_SIZE;
+   if (total_power < 1000)
+   {
+      #ifdef DEBUG
+      fmt::println("Skipping sample batch, power {:.1f} is too low", total_power);
+      #endif
+      return true;
+   }
 
    double lowest_frequency = 55.0; // equivalent of A1
    std::array<double, 12> bins{};

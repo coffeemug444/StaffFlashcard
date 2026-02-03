@@ -78,7 +78,12 @@ enum class NoteModifier
    SHARP = 1,
 };
 
-using NoteOctave = std::pair<Note, int>;
+struct NoteOctave {
+   Note note;
+   int octave;
+
+   bool operator==(const NoteOctave&) const = default;
+};
 
 struct NoteSet {
    std::vector<NoteOctave> notes;
@@ -86,11 +91,14 @@ struct NoteSet {
 };
 
 Note mapIndexToNote(int index);
-int mapNoteToToneIndex(NoteOctave note_octave);
+int toneIndex(Note note);
+int noteOctaveIndex(NoteOctave);
 int mapNoteToStaffIndex(NoteOctave note_octave);
 NoteModifier getModifier(Note note);
 
 bool notesAreEnharmonic(Note note1, Note note2);
+
+int fretOfNote(NoteOctave note, int position);
 
 std::vector<Note> getAllNotes();
 std::vector<Note> getNotesForKey(Note note, Key key);

@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <ranges>
 
+
 constexpr std::array ALL_OCTAVES = std::to_array({0,1,2,3});
 
 namespace
@@ -72,7 +73,7 @@ StaffSetup::StaffSetup(const std::function<void(const std::vector<NoteSet>&)> &p
    ,m_V_position_button{"V", POS_SIZE}
    ,m_VI_position_button{"VI", POS_SIZE}
    ,m_VII_position_button{"VII", POS_SIZE}
-   ,m_VIII_position_button{"VIII", POS_SIZE}
+   ,m_IIX_position_button{"IIX", POS_SIZE}
    ,m_IX_position_button{"IX", POS_SIZE}
    ,m_position_go_button{"->", std::bind(&StaffSetup::useSelectedPositions, this), {40.f, 40.f}}
    ,m_string_label{FONT, "String: "}
@@ -114,7 +115,7 @@ StaffSetup::StaffSetup(const std::function<void(const std::vector<NoteSet>&)> &p
    m_VI_position_button.move({  120.f + (2*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (1*(POS_SIZE.y + 10.f))});
    
    m_VII_position_button.move({ 120.f + (0*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (2*(POS_SIZE.y + 10.f))});
-   m_VIII_position_button.move({120.f + (1*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (2*(POS_SIZE.y + 10.f))});
+   m_IIX_position_button.move({120.f + (1*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (2*(POS_SIZE.y + 10.f))});
    m_IX_position_button.move({  120.f + (2*(POS_SIZE.x + 10.f)),(m_major_buttons.size()*50.f) + (2*(POS_SIZE.y + 10.f))});
 
    m_position_go_button.move({120.f + (6*50.f),(m_major_buttons.size()*50.f) + (1*(POS_SIZE.y + 10.f))});
@@ -137,7 +138,7 @@ std::vector<NoteOctave> StaffSetup::filterNotes(const std::vector<NoteOctave>& n
    return notes 
       | std::ranges::views::filter([this](NoteOctave note) 
       { 
-         switch (getModifier(note.first))
+         switch (getModifier(note.note))
          {
          case NoteModifier::FLAT:
             return m_flats_checkbox.checked();
@@ -216,9 +217,9 @@ void StaffSetup::useSelectedPositions()
    {
       note_sets.push_back({filterNotes(noteOctavesForPosition(7)), {"VII"}});
    }
-   if (m_VIII_position_button.checked())
+   if (m_IIX_position_button.checked())
    {
-      note_sets.push_back({filterNotes(noteOctavesForPosition(8)), {"VIII"}});
+      note_sets.push_back({filterNotes(noteOctavesForPosition(8)), {"IIX"}});
    }
    if (m_IX_position_button.checked())
    {
@@ -245,7 +246,7 @@ void StaffSetup::mouseMoved(const sf::Vector2f& pos)
    fn(m_V_position_button);
    fn(m_VI_position_button);
    fn(m_VII_position_button);
-   fn(m_VIII_position_button);
+   fn(m_IIX_position_button);
    fn(m_IX_position_button);
    fn(m_position_go_button);
    fn(m_E_string_button);
@@ -274,7 +275,7 @@ void StaffSetup::mouseDown(const sf::Vector2f& pos)
    fn(m_V_position_button);
    fn(m_VI_position_button);
    fn(m_VII_position_button);
-   fn(m_VIII_position_button);
+   fn(m_IIX_position_button);
    fn(m_IX_position_button);
    fn(m_position_go_button);
    fn(m_E_string_button);
@@ -303,7 +304,7 @@ void StaffSetup::mouseUp(const sf::Vector2f& pos)
    fn(m_V_position_button);
    fn(m_VI_position_button);
    fn(m_VII_position_button);
-   fn(m_VIII_position_button);
+   fn(m_IIX_position_button);
    fn(m_IX_position_button);
    fn(m_position_go_button);
    fn(m_E_string_button);
@@ -346,7 +347,7 @@ void StaffSetup::draw(sf::RenderTarget& target, sf::RenderStates /*states*/) con
    target.draw(m_V_position_button);
    target.draw(m_VI_position_button);
    target.draw(m_VII_position_button);
-   target.draw(m_VIII_position_button);
+   target.draw(m_IIX_position_button);
    target.draw(m_IX_position_button);
    target.draw(m_position_go_button);
    target.draw(m_string_label);
