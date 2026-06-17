@@ -53,26 +53,48 @@ bool AudioProcessor::onProcessSamples(const int16_t* samples, std::size_t sample
       return true;
    }
 
+
+   #ifdef DEBUG
+   sf::Clock clock{};
+   auto start = clock.getElapsedTime().asMicroseconds();
+   #endif
+
    double lowest_frequency = 55.0; // equivalent of A1
+   std::array<double, 12*8> all_note_powers{};
+   for (int note = 0; note < ssize(all_note_powers); note++)
+   {
+      double frequency = lowest_frequency*std::pow(2.0, note/12.0);
+      all_note_powers.at(note) = goertzelMag(samples_double, frequency);
+   }
+
+   auto getNotePower = [&](int index){
+      if (index < 0) return 0.0;
+      return all_note_powers.at(index);
+   };
+
    std::array<double, 12> bins{};
 
    for (int note = 0; note < 12*5; note++)
    {
-      double frequency = lowest_frequency*std::pow(2.0, note/12.0);
       // 5 octaves of notes
-      double sub_harm2     = goertzelMag(samples_double, (1/5.0)*frequency);
-      double sub_harm1     = goertzelMag(samples_double, (1/3.0)*frequency);
-      double base          = goertzelMag(samples_double, 1*frequency);
-      double octave        = goertzelMag(samples_double, 2*frequency);
-      double harm1         = goertzelMag(samples_double, 3*frequency);
-      double double_octave = goertzelMag(samples_double, 4*frequency);
-      double harm2         = goertzelMag(samples_double, 5*frequency);
+      double sub_harm2{getNotePower(note - 24 - 4)}; // (1/5.0)*frequency
+      double sub_harm1{getNotePower(note - 12 - 7)}; // (1/3.0)*frequency
+      double base = getNotePower(note); // 1*frequency
+      double octave{getNotePower(note + 12)}; // 2*frequency
+      double harm1{getNotePower(note + 12 + 7)}; // 3*frequency
+      double double_octave{getNotePower(note + 24)}; // 4*frequency
+      double harm2{getNotePower(note + 24 + 4)}; // 5*frequency
 
       double total = base + octave + double_octave + harm1 + harm2 - sub_harm1 - sub_harm2;
 
       int bin_index = note % 12;
       bins.at(bin_index) += total;
    }
+
+   #ifdef DEBUG
+   auto clock_end = clock.getElapsedTime().asMicroseconds();
+   fmt::println("{}us", clock_end - start);
+   #endif
 
    auto best_note = std::ranges::max_element(bins);
    int best_power = *best_note;
